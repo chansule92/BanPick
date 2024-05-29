@@ -5,7 +5,6 @@ import pandas as pd
 from .models import champion_index
 import MySQLdb
 
-conn = MySQLdb.connect(host='localhost', user='root', password='glemfk12', database='loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
  WHERE League in ('LCK Spring 2024','LEC Spring Season 2024','LCS Spring 2024')"""
