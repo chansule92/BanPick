@@ -99,15 +99,22 @@
           <tr>
             <td class="void">Blue Team</td>
             <td class="void"></td>
-            <td id="championImage0" onclick="toggleDropdown(this,0)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown0(this)"></td>      
+            <td id="championImage0" onclick="toggleDropdown(this,0)">
+                <img src="{% if blue_team.0 %}/static/{{ blue_team.0 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>    
             <td class="void"></td>
-            <td id="championImage1" onclick="toggleDropdown(this,1)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown1(this)"></td>
-            <td class="void"></td>
-            <td id="championImage2" onclick="toggleDropdown(this,2)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown2(this)"></td>
-            <td class="void"></td>
-            <td id="championImage3" onclick="toggleDropdown(this,3)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown3(this)"></td>
-            <td class="void"></td>
-            <td id="championImage4" onclick="toggleDropdown(this,4)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown4(this)"></td>
+            <td id="championImage1" onclick="toggleDropdown(this,1)">
+                <img src="{% if blue_team.1 %}/static/{{ blue_team.1 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td><td class="void"></td>
+            <td id="championImage2" onclick="toggleDropdown(this,2)">
+                <img src="{% if blue_team.2 %}/static/{{ blue_team.2 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td><td class="void"></td>
+            <td id="championImage3" onclick="toggleDropdown(this,3)">
+                <img src="{% if blue_team.3 %}/static/{{ blue_team.3 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td><td class="void"></td>
+            <td id="championImage4" onclick="toggleDropdown(this,4)">
+                <img src="{% if blue_team.4 %}/static/{{ blue_team.4 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>
           </tr>
           <tr>
             <td class="void"></td>
@@ -125,25 +132,36 @@
           <tr>
             <td class="void">Red Team</td>
             <td class="void"></td>
-            <td id="championImage5" onclick="toggleDropdown(this,5)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown5(this)"></td>
+            <td id="championImage5" onclick="toggleDropdown(this,5)">
+                <img src="{% if red_team.0 %}/static/{{ red_team.0 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>  
             <td class="void"></td>
-            <td id="championImage6" onclick="toggleDropdown(this,6)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown6(this)"></td>
+            <td id="championImage6" onclick="toggleDropdown(this,6)">
+                <img src="{% if red_team.1 %}/static/{{ red_team.1 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>  
             <td class="void"></td>
-            <td id="championImage7" onclick="toggleDropdown(this,7)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown7(this)"></td>
+            <td id="championImage7" onclick="toggleDropdown(this,7)">
+                <img src="{% if red_team.2 %}/static/{{ red_team.2 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>  
             <td class="void"></td>
-            <td id="championImage8" onclick="toggleDropdown(this,8)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown8(this)"></td>
+            <td id="championImage8" onclick="toggleDropdown(this,8)">
+                <img src="{% if red_team.3 %}/static/{{ red_team.3 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>  
             <td class="void"></td>
-            <td id="championImage9" onclick="toggleDropdown(this,9)"><img src="" style="width: 100%; height: 100%;" onclick="toggleDropdown9(this)"></td>
-          </tr>
+            <td id="championImage9" onclick="toggleDropdown(this,9)">
+                <img src="{% if red_team.4 %}/static/{{ red_team.4 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%;">
+            </td>  
+        </tr>
         </tbody>
       </table>
-      <form action="" method="post">
-          {% csrf_token %}
-          {% for i in pick %}
-              <input type="hidden" id="championInput{{ i }}" name="champion{{ i }}" value="">
-          {% endfor %}
-          <button type="submit" class="submit-button">Submit</button>
-      </form>
+    <form id="championForm" action="" method="post" onsubmit="return submitForm()">
+        {% csrf_token %}
+        {% for i in pick %}
+            <input type="hidden" id="championInput{{ i }}" name="champion{{ i }}" value="{% if blue_team and i < 5 %}{{ blue_team.i }}{% elif red_team and i >= 5 %}{{ red_team.i|add:"-5" }}{% endif %}">
+        {% endfor %}
+        <button type="submit" class="submit-button">Submit</button>
+    </form>
+
       {{value}}
     
 
@@ -165,72 +183,73 @@
   {% endfor %}
     <script>
         function submitForm() {
-        // 1. 선택된 챔피언 이미지의 src 속성 값을 추출하여 input 필드에 저장합니다.
-        const championImages = document.querySelectorAll('.champion-image');
-        championImages.forEach(function(image) {
-            const championName = image.src.split('/').pop().split('.')[0];
-            const inputId = image.id.replace('championImage', 'championInput');
-            const input = document.getElementById(inputId);
-            input.value = championName;
-        });
-
-        // 2. 선택된 챔피언 정보를 Local Storage에 저장합니다.
-        const championInputs = document.querySelectorAll('.champion-input');
-        championInputs.forEach(function(input) {
-            localStorage.setItem(input.id, input.value);
-        });
-
-        // 3. 페이지 새로고침 또는 다른 페이지 이동 후에도 Local Storage에 저장된 값을 input 필드에 다시 불러와 설정합니다.
-        window.addEventListener('load', function() {
-            const championInputs = document.querySelectorAll('.champion-input');
-            championInputs.forEach(function(input) {
-            input.value = localStorage.getItem(input.id);
+            // 1. 선택된 챔피언 이미지의 src 속성 값을 추출하여 input 필드에 저장합니다.
+            const championImages = document.querySelectorAll('td[id^="championImage"] img');
+            championImages.forEach(function(image) {
+                const championName = image.src.split('/').pop().split('.')[0];
+                const inputId = image.parentElement.id.replace('championImage', 'championInput');
+                const input = document.getElementById(inputId);
+                input.value = championName;
             });
-        });
 
-        // 4. Submit 버튼 클릭 시 폼을 제출합니다.
-        document.querySelector('form').submit();
+            // 2. 선택된 챔피언 정보를 Local Storage에 저장합니다.
+            const championInputs = document.querySelectorAll('input[id^="championInput"]');
+            championInputs.forEach(function(input) {
+                localStorage.setItem(input.id, input.value);
+            });
+
+            // 3. 페이지 새로고침 또는 다른 페이지 이동 후에도 Local Storage에 저장된 값을 input 필드에 다시 불러와 설정합니다.
+            window.addEventListener('load', function() {
+                const championInputs = document.querySelectorAll('input[id^="championInput"]');
+                championInputs.forEach(function(input) {
+                    input.value = localStorage.getItem(input.id);
+                });
+            });
+
+            // 4. Submit 버튼 클릭 시 폼을 제출합니다. 이중 제출을 방지합니다.
+            document.querySelector(".submit-button").disabled = true;
+            return true;
         }
-      function toggleDropdown(cell, index) {
-        
-          var dropdown = document.getElementById("dropdown" + index);
-          var searchInput = dropdown.querySelector(".search-input");
-          var parentId = cell.id; // 부모 요소인 <td>의 id를 가져옴
 
-          // 부모 요소의 id를 사용하여 해당 이미지를 찾음
-          var image = document.getElementById(parentId).querySelector("img");
-          
-          closeAllDropdowns();
+        function toggleDropdown(cell, index) {
+            var dropdown = document.getElementById("dropdown" + index);
+            var searchInput = dropdown.querySelector(".search-input");
+            var parentId = cell.id; // 부모 요소인 <td>의 id를 가져옴
 
-          if (dropdown.style.display === "block") {
-              dropdown.style.display = "none";
-          } else {
-              dropdown.style.display = "block";
-              dropdown.style.top = (cell.offsetTop + cell.offsetHeight) + "px";
-              dropdown.style.left = cell.offsetLeft + "px";
-              searchInput.value = "";
-              var a = dropdown.querySelectorAll("a");
-              for (var i = 0; i < a.length; i++) {
-                  a[i].style.display = "";
-              }
-          }
-      }
+            // 부모 요소의 id를 사용하여 해당 이미지를 찾음
+            var image = document.getElementById(parentId).querySelector("img");
+            
+            closeAllDropdowns();
 
-      function searchFunction(event,index) {
-          var input, filter, a, i;
-          var dropdown = document.getElementById("dropdown"+index);
-          input = dropdown.querySelector(".search-input");
-          filter = input.value.toUpperCase();
-          a = dropdown.querySelectorAll("a");
-          for (i = 0; i < a.length; i++) {
-              if (a[i].innerHTML.toUpperCase().indexOf(filter) > -1) {
-                  a[i].style.display = "";
-              } else {
-                  a[i].style.display = "none";
-              }
-          }
-          event.stopPropagation(); // 이벤트 전파 중지
-      }
+            if (dropdown.style.display === "block") {
+                dropdown.style.display = "none";
+            } else {
+                dropdown.style.display = "block";
+                dropdown.style.top = (cell.offsetTop + cell.offsetHeight) + "px";
+                dropdown.style.left = cell.offsetLeft + "px";
+                searchInput.value = "";
+                var a = dropdown.querySelectorAll("a");
+                for (var i = 0; i < a.length; i++) {
+                    a[i].style.display = "";
+                }
+            }
+        }
+
+        function searchFunction(event,index) {
+            var input, filter, a, i;
+            var dropdown = document.getElementById("dropdown"+index);
+            input = dropdown.querySelector(".search-input");
+            filter = input.value.toUpperCase();
+            a = dropdown.querySelectorAll("a");
+            for (i = 0; i < a.length; i++) {
+                if (a[i].innerHTML.toUpperCase().indexOf(filter) > -1) {
+                    a[i].style.display = "";
+                } else {
+                    a[i].style.display = "none";
+                }
+            }
+            event.stopPropagation(); // 이벤트 전파 중지
+        }
   
         window.onclick = function(event) {
             closeAllDropdowns();
@@ -243,50 +262,38 @@
             });
         }
 
+        // 클릭 이벤트 전파 중지 함수
+        function stopPropagation(event) {
+            event.stopPropagation();
+        }
 
-      // 클릭 이벤트 전파 중지 함수
-      function stopPropagation(event) {
-          event.stopPropagation();
-      }
-  
-      // 드롭다운이 외부를 클릭하면 닫히도록 설정
-      //window.onclick = function(event) {
-      //    var dropdowns = document.querySelectorAll('.dropdown-content');
-      //    dropdowns.forEach(function(dropdown) {
-      //        var cell = dropdown.parentNode;
-      //        if (!cell.contains(event.target) && dropdown.style.display === 'block') {
-      //            dropdown.style.display = 'none';
-      //        }
-      //    });
-      //}
         window.addEventListener('click', function(event) {
-        const dropdowns = document.querySelectorAll('.dropdown-content');
-        dropdowns.forEach(function(dropdown) {
-            const cell = dropdown.parentNode; // 부모 요소인 <td>를 가져옴
-            if (!cell.contains(event.target) && dropdown.style.display === 'block') {
-            dropdown.style.display = 'none';
-            }
-        });
+            const dropdowns = document.querySelectorAll('.dropdown-content');
+            dropdowns.forEach(function(dropdown) {
+                const cell = dropdown.parentNode; // 부모 요소인 <td>를 가져옴
+                if (!cell.contains(event.target) && dropdown.style.display === 'block') {
+                dropdown.style.display = 'none';
+                }
+            });
         });
 
         document.getElementById('myTable').addEventListener('click', function(event) {
-        // <table> 안을 클릭하면 무시하도록 설정
-        event.stopPropagation();
+            // <table> 안을 클릭하면 무시하도록 설정
+            event.stopPropagation();
         });
 
-       
-      // 챔피언 이미지 변경 함수
-      function changeChampionImage(championName, id) {
-        var image = document.getElementById(id).querySelector("img");
-        if (championName) {
-            image.src = "/static/" + championName + ".png";
-        } else {
-            image.src = "None.png";
+        // 챔피언 이미지 변경 함수
+        function changeChampionImage(championName, id) {
+            var image = document.getElementById(id).querySelector("img");
+            if (championName) {
+                image.src = "/static/" + championName + ".png";
+            } else {
+                image.src = "/static/None.png";
+            }
+            var input = document.getElementById("championInput" + id.replace('championImage', ''));
+            input.value = championName;
+            input.classList.add('champion-input'); // 추가: 클래스 추가하여 로컬 스토리지에 저장 가능하게 함
         }
-        var input = document.getElementById("championInput" + id.replace('championImage', ''));
-        input.value = championName;
-    }
-  </script>
-  
+    </script>
 </body>
 </html>

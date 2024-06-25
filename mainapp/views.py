@@ -4,8 +4,8 @@ from django.db.models import Count, Sum, Subquery, OuterRef, Avg, Max,F, Q
 import pandas as pd
 from .models import champion_index
 import MySQLdb
+from django.shortcuts import render
 
-conn = MySQLdb.connect(host='localhost', user='root', password='glemfk12', database='loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
  WHERE League in ('LCK Spring 2024','LEC Spring Season 2024','LCS Spring 2024')"""
@@ -124,6 +124,8 @@ SELECT M1.Champion
       , M1.con_champ
 """
 df = pd.read_sql(query, conn)
+df['Champion'] = df['Champion'].str.lower()
+df['con_champ'] = df['con_champ'].str.lower()
 conn.close()
 
 
@@ -181,7 +183,6 @@ for game in game_list_df['Game_ID'].values:
         sum3+=i[2]
         sum4+=i[3]
         sum5+=i[4]
-    blue_final_list=[sum1,sum2,sum3,sum4,sum5]
     red_temp_list=[]
     for k in Red_Team:
         
@@ -222,35 +223,27 @@ for game in game_list_df['Game_ID'].values:
                     except IndexError:
                         Count_score = 0
         red_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
-    sum1=0
-    sum2=0
-    sum3=0
-    sum4=0
-    sum5=0
-    red_final_list=[]
+    sum6=0
+    sum7=0
+    sum8=0
+    sum9=0
+    sum10=0
     for i in red_temp_list:
-        sum1+=i[0]
-        sum2+=i[1]
-        sum3+=i[2]
-        sum4+=i[3]
-        sum5+=i[4]
-    red_final_list.append(sum1)
-    red_final_list.append(sum2)
-    red_final_list.append(sum3)
-    red_final_list.append(sum4)
-    red_final_list.append(sum5)
+        sum6+=i[0]
+        sum7+=i[1]
+        sum8+=i[2]
+        sum9+=i[3]
+        sum10+=i[4]
     if result[game]['BLUE'][1] == 'WIN':
-        blue_final_list.append(1)
-        red_final_list.append(0)
+        game_result=1
     else :
-        blue_final_list.append(0)
-        red_final_list.append(1)
-    df_list.append(blue_final_list)
-    df_list.append(red_final_list)
+        game_result=0
+    result_list=[sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,game_result]
+    df_list.append(result_list)
+df_list
 final_df=pd.DataFrame(df_list)
-final_df.columns=['Ban','Pick','Win_rate','Duo_Score','Count_Score','Result']
-final_df
-features=final_df[['Pick','Win_rate','Duo_Score','Count_Score']]
+final_df.columns=['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore','Result']
+features=final_df[['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore']]
 result=final_df['Result']
 
 from sklearn.model_selection import train_test_split
@@ -269,24 +262,7 @@ from sklearn.linear_model import LogisticRegression
 model = LogisticRegression()  
 model.fit(train_features, train_labels)
 
-
-def index(request):
-    student_information=champion_index.objects.values('EN','KR')
-    template = loader.get_template("mainapp/index.html")
-    pick = [0,1,2,3,4,5,6,7,8,9]
-    champion0 = request.POST.get('champion0')
-    champion1 = request.POST.get('champion1')
-    champion2 = request.POST.get('champion2')
-    champion3 = request.POST.get('champion3')
-    champion4 = request.POST.get('champion4')
-    champion5 = request.POST.get('champion5')
-    champion6 = request.POST.get('champion6')
-    champion7 = request.POST.get('champion7')
-    champion8 = request.POST.get('champion8')
-    champion9 = request.POST.get('champion9')
-    Blue_Team = [champion0,champion1,champion2,champion3,champion4]
-    Red_Team = [champion5,champion6,champion7,champion8,champion9]
-    result_df={}
+def process_teams(Blue_Team, Red_Team):
     for k in Blue_Team:
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
@@ -336,10 +312,8 @@ def index(request):
         sum3+=i[2]
         sum4+=i[3]
         sum5+=i[4]
-    blue_final_list=[sum1,sum2,sum3,sum4,sum5]
     red_temp_list=[]
     for k in Red_Team:
-        
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
@@ -377,42 +351,47 @@ def index(request):
                     except IndexError:
                         Count_score = 0
         red_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
-    sum1=0
-    sum2=0
-    sum3=0
-    sum4=0
-    sum5=0
-    red_final_list=[]
+    sum6=0
+    sum7=0
+    sum8=0
+    sum9=0
+    sum10=0
     for i in red_temp_list:
-        sum1+=i[0]
-        sum2+=i[1]
-        sum3+=i[2]
-        sum4+=i[3]
-        sum5+=i[4]
-    red_final_list.append(sum1)
-    red_final_list.append(sum2)
-    red_final_list.append(sum3)
-    red_final_list.append(sum4)
-    red_final_list.append(sum5)
-    blue_df=pd.DataFrame([blue_final_list])
-    red_df=pd.DataFrame([red_final_list])
-    blue_df.columns=['Ban','Pick','Win_rate','Duo_Score','Count_Score']
-    red_df.columns=['Ban','Pick','Win_rate','Duo_Score','Count_Score']
-    result_df={'BLUE': blue_df, 'RED': red_df}
-    ml_result=[]
-    temp_list=[]
-    blue_features=result_df['BLUE'][['Pick','Win_rate','Duo_Score','Count_Score']]
-    blue_features=scaler.transform(blue_features)
-    temp_list.append(model.predict_proba(blue_features)[0][0])
-    red_features=result_df['RED'][['Pick','Win_rate','Duo_Score','Count_Score']]
-    red_features=scaler.transform(red_features)
-    temp_list.append(model.predict_proba(red_features)[0][0])
-    ml_result.append(temp_list)
-    ml_result
+        sum6+=i[0]
+        sum7+=i[1]
+        sum8+=i[2]
+        sum9+=i[3]
+        sum10+=i[4]
+    result = [[sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10]]
+    result
+    features=pd.DataFrame(result)
+    features.columns=['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore']
+    ml_features=scaler.transform(features)
+    result=model.predict_proba(ml_features)
+    return [round(result[0][0]*100,2),round(result[0][1]*100,2)]
+
+def index(request):
+    student_information = champion_index.objects.values('EN', 'KR')
+    pick = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+    blue_team = []
+    red_team = []
+
+    if request.method == 'POST':
+        for i in range(5):
+            blue_team.append(request.POST.get(f'champion{i}'))
+        for i in range(5, 10):
+            red_team.append(request.POST.get(f'champion{i}'))
+    print(blue_team)
+    print(red_team)
+    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
+    print(result_df)
     context = {
-        "student_information":student_information,
-        "pick":pick,
-        "value" : ml_result
+        "student_information": student_information,
+        "pick": pick,
+        "blue_team": blue_team,
+        "red_team": red_team,
+        "value": result_df,
     }
-    return HttpResponse(template.render(context,request))
+    return render(request, 'mainapp/index.html', context)
+
 
