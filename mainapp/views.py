@@ -135,6 +135,7 @@ for game in game_list_df['Game_ID'].values:
     Red_Team=result[game]['RED'][0]
     blue_temp_list=[]
     for k in Blue_Team:
+        k=k.lower()
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
@@ -185,7 +186,7 @@ for game in game_list_df['Game_ID'].values:
         sum5+=i[4]
     red_temp_list=[]
     for k in Red_Team:
-        
+        k=k.lower()
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
@@ -263,6 +264,7 @@ model = LogisticRegression()
 model.fit(train_features, train_labels)
 
 def process_teams(Blue_Team, Red_Team):
+    blue_temp_list=[]
     for k in Blue_Team:
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
@@ -383,6 +385,7 @@ def index(request):
             red_team.append(request.POST.get(f'champion{i}'))
     print(blue_team)
     print(red_team)
+    result_df = []
     result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
     print(result_df)
     context = {
