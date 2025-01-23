@@ -53,7 +53,7 @@
         }
 
         .void {
-           width: 20px; 
+           width: 20px;
            border: none;
            font-size: 24px;
            text-align: center;
@@ -150,13 +150,6 @@
             font-weight: bold;
             color: #e74c3c;
         }
-        .win-rate {
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            margin-top: 20px;
-            color: #3498db;
-        }
 
     </style>
 </head>
@@ -169,7 +162,7 @@
             <tr>
                 <td id="championImage0" onclick="toggleDropdown(this,0)">
                     <img src="{% if blue_team.0 %}/static/{{ blue_team.0 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>    
+                </td>
                 <td class="void"></td>
                 <td id="championImage1" onclick="toggleDropdown(this,1)">
                     <img src="{% if blue_team.1 %}/static/{{ blue_team.1 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
@@ -191,38 +184,39 @@
                 <td colspan="11" class="void vs-label">VS</td>
             </tr>
             <tr>
-                <td colspan="11" class="team-label">Red Team</td>
+                <td style="border: 2px solid #FF6384; color:#FF6384;" colspan="11" class="team-label">Red Team</td>
             </tr>
             <tr>
-                <td id="championImage5" onclick="toggleDropdown(this,5)">
+                <td style="border: 2px solid #FF6384;" id="championImage5" onclick="toggleDropdown(this,5)">
                     <img src="{% if red_team.0 %}/static/{{ red_team.0 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>  
+                </td>
                 <td class="void"></td>
-                <td id="championImage6" onclick="toggleDropdown(this,6)">
+                <td style="border: 2px solid #FF6384;" id="championImage6" onclick="toggleDropdown(this,6)">
                     <img src="{% if red_team.1 %}/static/{{ red_team.1 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>  
+                </td>
                 <td class="void"></td>
-                <td id="championImage7" onclick="toggleDropdown(this,7)">
+                <td style="border: 2px solid #FF6384;" id="championImage7" onclick="toggleDropdown(this,7)">
                     <img src="{% if red_team.2 %}/static/{{ red_team.2 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>  
+                </td>
                 <td class="void"></td>
-                <td id="championImage8" onclick="toggleDropdown(this,8)">
+                <td style="border: 2px solid #FF6384;" id="championImage8" onclick="toggleDropdown(this,8)">
                     <img src="{% if red_team.3 %}/static/{{ red_team.3 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>  
+                </td>
                 <td class="void"></td>
-                <td id="championImage9" onclick="toggleDropdown(this,9)">
+                <td style="border: 2px solid #FF6384;" id="championImage9" onclick="toggleDropdown(this,9)">
                     <img src="{% if red_team.4 %}/static/{{ red_team.4 }}.png{% else %}/static/None.png{% endif %}" style="width: 100%; height: 100%; border-radius: 8px;">
-                </td>  
+                </td>
             </tr>
         </table>
-        <form id="championForm" action="" method="post" onsubmit="return submitForm()">
+        <form id="championForm" action="{% url 'result' %}" method="post" onsubmit="return submitForm()">
             {% csrf_token %}
             {% for i in pick %}
-                <input type="hidden" id="championInput{{ i }}" name="champion{{ i }}" value="{% if blue_team and i < 5 %}{{ blue_team.i }}{% elif red_team and i >= 5 %}{{ red_team.i|add:"-5" }}{% endif %}">
+                <!--<input type="hidden" id="championInput{{ i }}" name="champion{{ i }}" value="{% if blue_team and i < 5 %}{{ blue_team.i }}{% elif red_team and i >= 5 %}{{ red_team.i|add:"-5" }}{% endif %}">-->
+                <input type="hidden" id="championInput{{ i }}" name="champion" value="{% if blue_team and i < 5 %}{{ blue_team.i }}{% elif red_team and i >= 5 %}{{ red_team.i|add:"-5" }}{% endif %}">
             {% endfor %}
-            <button type="submit" class="submit-button">Submit</button>
+            <button type="submit" class="submit-button" >Submit</button>
         </form>
-        <div class="win-rate">Blue Team : {{value.0}} &nbsp;&nbsp;&nbsp; Red Team : {{value.1}}</div>
+
 
 
         {% if processed_value %}
@@ -285,7 +279,7 @@
         function toggleDropdown(cell, index, event) {
             var dropdown = document.getElementById("dropdown" + index);
             var searchInput = dropdown.querySelector(".search-input");
-            
+
             if (dropdown.style.display === "block") {
                 dropdown.style.display = "none";
             } else {
@@ -299,12 +293,12 @@
                 for (var i = 0; i < a.length; i++) {
                     a[i].style.display = "";
                 }
-                
+
                 setTimeout(function() {
                     searchInput.focus();
                 }, 0);
             }
-            
+
             event.stopPropagation();
         }
 
@@ -328,6 +322,22 @@
             input = dropdown.querySelector(".search-input");
             filter = input.value.toUpperCase();
             a = dropdown.querySelectorAll("a");
+
+            // Enter 키를 눌렀을 때의 처리
+            if (event.key === 'Enter') {
+                // 보이는 첫 번째 챔피언 찾기
+                for (i = 0; i < a.length; i++) {
+                    if (a[i].style.display !== "none") {
+                        // 첫 번째 보이는 챔피언 선택
+                        var championName = a[i].getAttribute("onclick").split("'")[1];
+                        changeChampionImage(championName, 'championImage' + index);
+                        return;
+                    }
+                }
+                return;
+            }
+
+            // 기존 검색 로직
             for (i = 0; i < a.length; i++) {
                 if (a[i].textContent.toUpperCase().indexOf(filter) > -1) {
                     a[i].style.display = "";
@@ -336,7 +346,7 @@
                 }
             }
         }
-  
+
         window.onclick = function(event) {
             closeAllDropdowns();
         };
@@ -402,6 +412,7 @@
             document.querySelector(".submit-button").disabled = true;
             return true;
         }
+
 
 
     </script>
