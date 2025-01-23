@@ -5,12 +5,15 @@ import pandas as pd
 from .models import champion_index
 import MySQLdb
 from django.shortcuts import render
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
+import numpy as np
 
-
-conn = MySQLdb.connect(host='localhost', user='root', password='glemfk12', database='loldb')
+conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
- WHERE League in ('LCK Spring 2024','LEC Spring Season 2024','LCS Spring 2024')"""
+ WHERE Ver in ('v15.1')"""
 
 game_list_df = pd.read_sql(game_list_query, conn)
 
@@ -20,7 +23,7 @@ result={}
 Team_div = ['BLUE','RED']
 Position_div = ['TOP','JUNGLE','MID','ADC','SUPPORT']
 result={}
-for i in game_list:  
+for i in game_list:
     team_id={}
     for j in Team_div:
         temp_list=[]
@@ -38,7 +41,7 @@ query = """
 SELECT M1.Champion
      , M1.con_champ
      , MAX(M1.BP) AS BP
-     , MAX(M1.Ban) AS Ban 
+     , MAX(M1.Ban) AS Ban
      , MAX(M1.Pick) AS Pick
      , MAX(M1.total_win_rate) AS Win_rate
      , CASE WHEN MAX(M1.duo_score) = 0 THEN min(M1.duo_score) ELSE Max(M1.duo_score) end AS Duo_Score
@@ -73,59 +76,72 @@ SELECT M1.Champion
                                 , SUM(CASE WHEN BP_DIV = 'Pick' THEN 1 ELSE 0 END) AS Pick
                              FROM ( SELECT 'Ban' AS BP_DIV
                                           , Ban AS Champion
-                                       FROM a_game_ban
-                                      UNION ALL 
+                                       FROM a_game_ban A
+                                            INNER JOIN a_game B
+                                         ON A.Game_ID = B.Game_ID
+                                      WHERE B.Ver in ('v15.1')
+                                      UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
-                                       FROM a_game_ban
+                                       FROM a_game_ban A
+                                            INNER JOIN a_game B
+                                         ON A.Game_ID = B.Game_ID
+                                      WHERE B.Ver in ('v15.1')
                                   ) A
                             GROUP BY Champion
                          ) T1
-                         LEFT OUTER JOIN 
-                         ( WITH t1 AS
-                           ( SELECT A.Game_ID
-                                  , A.Champion
-                                  , A.Team_Div
-                                  , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
-                               FROM a_game_stat A
-                                    INNER JOIN a_game B
-                                 ON A.Game_ID = B.Game_ID 
-                              WHERE A.Game_ID LIKE '%LCKSpring2024%'
-                           )
-                           SELECT A.Champion AS stan_champ
+                         LEFT OUTER JOIN
+                         ( SELECT A.Champion AS stan_champ
                                 , B.Champion AS con_champ
                                 , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END AS Team_YN
                                 , count(DISTINCT A.Game_ID) AS play_cnt
                                 , count(DISTINCT CASE WHEN A.RESULT = 'Win' THEN A.Game_ID ELSE NULL END) AS win_cnt
-                             FROM t1 A
-                                  LEFT OUTER JOIN 
-                                  t1 B
+                             FROM ( SELECT A.Game_ID
+                                         , A.Champion
+                                         , A.Team_Div
+                                         , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
+                                      FROM a_game_stat A
+                                           INNER JOIN a_game B
+                                        ON A.Game_ID = B.Game_ID
+                                     WHERE B.Ver in ('v15.1')
+                                  ) A
+                                  LEFT OUTER JOIN
+                                  ( SELECT A.Game_ID
+                                         , A.Champion
+                                         , A.Team_Div
+                                         , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
+                                      FROM a_game_stat A
+                                           INNER JOIN a_game B
+                                        ON A.Game_ID = B.Game_ID
+                                     WHERE B.Ver in ('v15.1')
+                                  ) B
                                ON A.Game_ID = B.Game_ID
                               AND A.Champion != B.Champion
                             GROUP BY A.Champion
                                 , B.Champion
-                                , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END 
+                                , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END
                          ) T2
                       ON T1.Champion = T2.stan_Champ
                          LEFT OUTER JOIN
-                         ( SELECT A.Champion 
+                         ( SELECT A.Champion
                                 , sum(CASE WHEN A.Team_Div = 'Blue' AND B.Blue_Result = 'Win' THEN 1
                                            WHEN A.Team_Div = 'Red' AND B.Red_result = 'Win' THEN 1 ELSE 0 END) AS win_cnt
                              FROM a_game_stat A
                                   INNER JOIN a_game B
-                               ON A.Game_ID = B.Game_ID 
-                            WHERE B.League in ('LCK Spring 2024','LEC Spring Season 2024','LCS Spring 2024')
+                               ON A.Game_ID = B.Game_ID
+                            WHERE B.Ver in ('v15.1')
                             GROUP BY A.Champion
                          ) T3
                       ON T1.Champion = T3.Champion
                 ) M
-          WHERE duo_play_cnt > 2
-            AND BP > 9
+          WHERE 1=1
+            /* AND duo_play_cnt > 2
+            AND BP > 9 */
        ) M1
  GROUP BY M1.Champion
       , M1.con_champ
 """
-df = pd.read_sql(query, conn)
+df = pd.read_sql(query.replace('\n',' '), conn)
 df['Champion'] = df['Champion'].str.lower()
 df['con_champ'] = df['con_champ'].str.lower()
 conn.close()
@@ -149,10 +165,11 @@ for game in game_list_df['Game_ID'].values:
         try:
             Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
-            Win_rate=0
+            Win_rate=50
         Duo_score=0
         Count_score=0
         for i in Blue_Team:
+            i=i.lower()
             if k==i:
                 pass
             else :
@@ -164,6 +181,7 @@ for game in game_list_df['Game_ID'].values:
                     except IndexError:
                         Duo_score = 0
         for j in Red_Team:
+            j=j.lower()
             if k==j:
                 pass
             else :
@@ -200,10 +218,11 @@ for game in game_list_df['Game_ID'].values:
         try:
             Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
-            Win_rate=0
+            Win_rate=50
         Duo_score=0
         Count_score=0
         for i in Red_Team:
+            i=i.lower()
             if k==i:
                 pass
             else :
@@ -215,6 +234,7 @@ for game in game_list_df['Game_ID'].values:
                     except IndexError:
                         Duo_score = 0
         for j in Blue_Team:
+            j=j.lower()
             if k==j:
                 pass
             else :
@@ -253,16 +273,16 @@ from sklearn.model_selection import train_test_split
 
 train_features, test_features, train_labels, test_labels = train_test_split(features, result)
 
-from sklearn.preprocessing import StandardScaler  
-  
-scaler = StandardScaler()  
-  
-train_features = scaler.fit_transform(train_features)  
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+train_features = scaler.fit_transform(train_features)
 test_features = scaler.transform(test_features)
 
-from sklearn.linear_model import LogisticRegression  
-  
-model = LogisticRegression()  
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
 model.fit(train_features, train_labels)
 
 def process_teams(Blue_Team, Red_Team):
@@ -279,7 +299,7 @@ def process_teams(Blue_Team, Red_Team):
         try:
             Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
-            Win_rate=0
+            Win_rate=50
         Duo_score=0
         Count_score=0
         for i in Blue_Team:
@@ -329,7 +349,7 @@ def process_teams(Blue_Team, Red_Team):
         try:
             Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
-            Win_rate=0
+            Win_rate=50
         Duo_score=0
         Count_score=0
         for i in Red_Team:
@@ -372,7 +392,7 @@ def process_teams(Blue_Team, Red_Team):
     features.columns=['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore']
     ml_features=scaler.transform(features)
     result=model.predict_proba(ml_features)
-    return [round(result[0][0]*100,2),round(result[0][1]*100,2)]
+    return [round(result[0][0]*100,2),round(result[0][1]*100,2),features]
 
 def index(request):
     student_information = champion_index.objects.values('EN', 'KR')
@@ -385,18 +405,157 @@ def index(request):
             blue_team.append(request.POST.get(f'champion{i}'))
         for i in range(5, 10):
             red_team.append(request.POST.get(f'champion{i}'))
-    print(blue_team)
-    print(red_team)
-    result_df = []
-    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
-    print(result_df)
+
     context = {
         "student_information": student_information,
         "pick": pick,
         "blue_team": blue_team,
-        "red_team": red_team,
-        "value": result_df,
+        "red_team": red_team
     }
     return render(request, 'mainapp/index.html', context)
+
+def result(request):
+    if request.method == 'POST':
+        selected_champions = request.POST.getlist('champion')
+    stats = []
+    for i in selected_champions:
+        stats.append([df[df['Champion']==i.replace('%20',' ')]['Ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
+    temp_chart_code=[]
+    count=0
+    blue_team = []
+    red_team = []
+    for i in selected_champions:
+        if count < 5:
+            blue_team.append(i.replace('%20',' '))
+        else:
+            red_team.append(i.replace('%20',' '))
+        count=count+1
+    blue_duo=[]
+    blue_count=[]
+    result_df = []
+    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
+    for i in blue_team:
+        blue_duo_2=[]
+        blue_count_2=[]
+        for j in blue_team:
+            if i!=j:
+                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
+                    blue_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
+                else :
+                    blue_duo_2.append(0)
+            else:
+                blue_duo_2.append(0)
+        blue_duo.append(blue_duo_2)
+        for k in red_team:
+            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
+                blue_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
+            else :
+                blue_count_2.append(0)
+        blue_count.append(blue_count_2)
+    red_duo=[]
+    red_count=[]
+    for i in red_team:
+        red_duo_2=[]
+        red_count_2=[]
+        for j in red_team:
+            if i!=j:
+                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
+                    red_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
+                else :
+                    red_duo_2.append(0)
+            else:
+                red_duo_2.append(0)
+        red_duo.append(red_duo_2)
+        for k in blue_team:
+            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
+                red_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
+            else :
+                red_count_2.append(0)
+        red_count.append(red_count_2)
+    chart_num=0
+    custom_colorscale = [
+        [0, '#FF6384'],      # 최소값
+        [0.5, 'white'],      # 중간값 (0)
+        [1, '#36A2EB']       # 최대값
+    ]
+    temp_chart_code = []
+    chart_num = -1  # 0부터 시작하도록 -1로 초기화
+
+    for i in [blue_duo, blue_count, red_duo, red_count]:
+        chart_num = chart_num + 1
+        temp_data = np.array(i)
+        temp_df = pd.DataFrame(temp_data)
+
+        # 열과 행 이름 설정
+        if chart_num in (0, 1):
+            temp_df.index = blue_team
+        else:
+            temp_df.index = red_team
+
+        if chart_num in (1, 2):
+            temp_df.columns = red_team
+        else:
+            temp_df.columns = blue_team
+
+        # Plotly figure 생성
+        fig = go.Figure(data=go.Heatmap(
+            z=temp_df.values,
+            x=temp_df.columns,
+            y=temp_df.index,
+            text=temp_df.values,
+            texttemplate='%{text:.1f}',
+            textfont={"size": 11,"family":"Arial"},
+            colorscale=custom_colorscale,
+            zmid=0,
+            zmin=-50,
+            zmax=50,
+            showscale=True,
+            xgap=3,  # x축 방향 간격 (픽셀)
+            ygap=3   # y축 방향 간격 (픽셀)
+        ))
+
+        # 레이아웃 설정
+        fig.update_layout(
+            paper_bgcolor='#0a0e21',  # 전체 배경색
+            plot_bgcolor='#1d1e33',   # 플롯 배경색
+            width=500,                # figsize=(5, 3)과 비슷한 크기
+            height=300,
+            margin=dict(l=50, r=50, t=50, b=30),
+            font=dict(
+                family='Arial',
+                color='white'         # 텍스트 색상
+            ),
+            xaxis=dict(
+                side='top',  # x축을 위에 표시
+                showgrid=False,
+                showline=False,
+                tickfont=dict(family="Arial")
+            ),
+            yaxis=dict(
+                autorange='reversed',  # Y축 역순 설정
+                showgrid=False,
+                showline=False,
+                tickfont=dict(family="Arial")
+            )
+        )
+
+        # x축, y축 설정
+        fig.update_xaxes(showgrid=False, showline=False)
+        fig.update_yaxes(showgrid=False, showline=False)
+
+        # HTML로 변환하여 저장
+        temp_chart_code.append(fig.to_html(
+            full_html=False,
+            include_plotlyjs='cdn',
+            div_id=f'THIS_IS_FIGID{chart_num}'
+        ))
+
+    context = {
+        'champions': selected_champions,
+        'stats': stats,
+        'temp_chart_code': temp_chart_code,
+        "value": result_df
+    }
+    return render(request, 'mainapp/result.html', context)
 
 
