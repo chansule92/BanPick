@@ -127,6 +127,9 @@
                 <div>
                     {{ temp_chart_code.1|safe }}
                 </div>
+                <div>
+                    {{ temp_chart_code.4|safe }}
+                </div>
             </div>
             <h1>VS</h1>
             <div class="container">
@@ -152,12 +155,16 @@
                 <div>
                     {{ temp_chart_code.3|safe }}
                 </div>
+                <div>
+                    {{ temp_chart_code.5|safe }}
+                </div>
             </div>
         </div>
         <div class="win-rate">
+            {{ temp_chart_code.5|safe }}
             Blue Team : {{value.0}} &nbsp;&nbsp;&nbsp; Red Team : {{value.1}}
         </div>
-        <button type="button" class="submit-button" onclick="location.href='https://chocopi.pythonanywhere.com/mainapp/'">다시 선택하기</button>
+        <button type="button" class="submit-button" onclick="location.href='http://127.0.0.1:8000/mainapp/'">다시 선택하기</button>
 </body>
 </html>
 

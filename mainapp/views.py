@@ -1,21 +1,18 @@
-from django.http import HttpResponse
-from django.template import loader
-from django.db.models import Count, Sum, Subquery, OuterRef, Avg, Max,F, Q
+from django.db import connection
 import pandas as pd
 from .models import champion_index
-import MySQLdb
 from django.shortcuts import render
-import matplotlib.pyplot as plt
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
 import numpy as np
+import random
+import plotly.express as px
 
-conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
+#conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
- WHERE Ver in ('v15.1')"""
+ WHERE Ver in ('v15.1','v15.2','v15.3','v15.4')"""
 
-game_list_df = pd.read_sql(game_list_query, conn)
+game_list_df = pd.read_sql(game_list_query, connection)
 
 
 game_list=game_list_df['Game_ID'].to_list()
@@ -33,7 +30,7 @@ for i in game_list:
             game_result=game_list_df[game_list_df['Game_ID']==i]['Red_Result'].values[0]
         for k in Position_div:
             champ_query="""SELECT Champion FROM a_game_stat where Game_ID = '{}' and Team_Div = '{}' and Role = '{}';""".format(i,j,k)
-            champ_df=pd.read_sql(champ_query, conn)
+            champ_df=pd.read_sql(champ_query, connection)
             temp_list.append((champ_df['Champion'].values)[0])
             team_id[j]=[temp_list,game_result]
             result[i]=team_id
@@ -79,14 +76,14 @@ SELECT M1.Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1')
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
                                       UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1')
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
                                   ) A
                             GROUP BY Champion
                          ) T1
@@ -103,7 +100,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1')
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
                                   ) A
                                   LEFT OUTER JOIN
                                   ( SELECT A.Game_ID
@@ -113,7 +110,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1')
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
                                   ) B
                                ON A.Game_ID = B.Game_ID
                               AND A.Champion != B.Champion
@@ -129,7 +126,7 @@ SELECT M1.Champion
                              FROM a_game_stat A
                                   INNER JOIN a_game B
                                ON A.Game_ID = B.Game_ID
-                            WHERE B.Ver in ('v15.1')
+                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
                             GROUP BY A.Champion
                          ) T3
                       ON T1.Champion = T3.Champion
@@ -141,10 +138,23 @@ SELECT M1.Champion
  GROUP BY M1.Champion
       , M1.con_champ
 """
-df = pd.read_sql(query.replace('\n',' '), conn)
+df = pd.read_sql(query.replace('\n',' '), connection)
+
 df['Champion'] = df['Champion'].str.lower()
 df['con_champ'] = df['con_champ'].str.lower()
-conn.close()
+
+
+query2="""SELECT B.Champion
+     , A.Gold_Data
+     , A.CS_Data
+  FROM a_game_timeline A
+       INNER JOIN a_game_stat B
+    ON A.game_ID = B.Game_ID
+   AND A.Team_Div = B.Team_Div
+   AND A.ROLE = B.Role
+ WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4')) """
+df2 = pd.read_sql(query2, connection)
+df2['Champion'] = df2['Champion'].str.lower()
 
 
 df_list=[]
@@ -261,14 +271,45 @@ for game in game_list_df['Game_ID'].values:
         game_result=1
     else :
         game_result=0
-    result_list=[sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10,game_result]
+    result_list=[sum3,sum4,sum5,sum8,sum9,sum10,game_result]
     df_list.append(result_list)
 df_list
 final_df=pd.DataFrame(df_list)
-final_df.columns=['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore','Result']
-features=final_df[['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore']]
+final_df.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore','Result']
+features=final_df[['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']]
 result=final_df['Result']
 
+
+
+
+cham_powergraph=[]
+champion_list=df2['Champion'].unique()
+for cham in champion_list:
+    gold_df=df2[df2['Champion']==cham]
+    time_gold=[]
+    for i in gold_df['Gold_Data']:
+        data=eval(i)
+        temp_list=[]
+        for j in range(0,len(data)-1):
+            if j != 0:
+                temp_list.append(int(data[j])-int(data[j-1]))
+        time_gold.append(temp_list)
+    power_graph=[]
+    for k in range(0,30):
+        temp=[]
+        for u in time_gold:
+            try:
+                temp.append(u[k])
+            except:
+                break
+        if len(temp) != 0:
+            value=round(sum(temp)/len(temp),2)
+        power_graph.append(value)
+    cham_powergraph.append([cham,power_graph])
+power_df=pd.DataFrame(cham_powergraph)
+power_df.columns = ['Champion','Gold_Data']
+
+"""
 from sklearn.model_selection import train_test_split
 
 train_features, test_features, train_labels, test_labels = train_test_split(features, result)
@@ -325,6 +366,7 @@ def process_teams(Blue_Team, Red_Team):
                     except IndexError:
                         Count_score = 0
         blue_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
+    #blue_temp_list=[0 if pd.isna(x) else x for x in blue_temp_list]
     sum1=0
     sum2=0
     sum3=0
@@ -386,13 +428,96 @@ def process_teams(Blue_Team, Red_Team):
         sum8+=i[2]
         sum9+=i[3]
         sum10+=i[4]
-    result = [[sum1,sum2,sum3,sum4,sum5,sum6,sum7,sum8,sum9,sum10]]
+    result = [[sum3,sum4,sum5,sum8,sum9,sum10]]
     result
     features=pd.DataFrame(result)
-    features.columns=['Blue_Ban','Blue_Pick','Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Ban','Red_Pick','Red_Winrate','Red_Duoscore','Red_Countscore']
+    features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
     ml_features=scaler.transform(features)
     result=model.predict_proba(ml_features)
     return [round(result[0][0]*100,2),round(result[0][1]*100,2),features]
+"""
+def power_graph(Cham_list):
+    powerdata_list=[]
+    for i in Cham_list:
+        if len(power_df[power_df['Champion']==i])!=0:
+            temp_str=''
+            temp_str=temp_str+power_df[power_df['Champion']==i].iloc[0][0]+str(power_df[power_df['Champion']==i].iloc[0][1])
+            powerdata_list.append(temp_str)
+    return powerdata_list
+
+def create_dataframe(data_list):
+    champion_data = {}
+    for line in data_list:
+        # 챔피언 이름과 데이터 분리
+        champion_name = line.split('[')[0].strip()
+        # 문자열 데이터를 숫자 리스트로 변환
+        values = [float(x.strip()) for x in line.split('[')[1].strip(']').split(',')]
+        champion_data[champion_name] = values
+
+    # DataFrame 생성을 위한 리스트 만들기
+    df_data = []
+    for champion, values in champion_data.items():
+        for time_point, value in enumerate(values,start=1):
+            df_data.append({
+                'Champion': champion,
+                'Time': time_point,
+                'Value': value
+            })
+
+    return pd.DataFrame(df_data)
+
+def create_power_graph(power_data):
+    # DataFrame 생성
+    power_df2 = create_dataframe(power_data)
+    # Plotly를 사용한 라인 차트 생성
+
+    max_value = max(power_df2['Value'])
+    # Y축 최대값을 데이터 최대값과 1000 중 큰 값으로 설정
+    y_max = max(max_value, 1000)
+    fig = px.line(power_df2,
+                  x='Time',
+                  y='Value',
+                  color='Champion',
+                  title='Champion Power Over Time(30min)',
+                  labels={'Time': 'Time',
+                         'Value': 'Earn Gold',
+                         'Champion': 'Champion'},
+                  markers=True)
+    # 차트 레이아웃 커스터마이징
+    fig.update_layout(
+        plot_bgcolor='#1d1e33',
+        paper_bgcolor='#0a0e21',
+        font=dict(
+                family='Arial',
+                color='white'         # 텍스트 색상
+            ),
+        legend=dict(
+            yanchor="top",
+            y=0.99,
+            xanchor="left",
+            x=1.02
+        ),
+        hovermode='x unified'
+    )
+    # 축 스타일 설정
+    fig.update_xaxes(
+        gridcolor='lightgrey',
+        zeroline=True,
+        zerolinewidth=1,
+        zerolinecolor='lightgrey'
+    )
+    fig.update_yaxes(
+        gridcolor='lightgrey',
+        zeroline=True,
+        zerolinewidth=1,
+        zerolinecolor='lightgrey',
+        range=[0, y_max * 1.1]
+    )
+    chart_code=(fig.to_html(
+            full_html=False,
+            include_plotlyjs='cdn',
+            div_id='THIS_IS_FIGID'+str(random.random())))
+    return chart_code
 
 def index(request):
     student_information = champion_index.objects.values('EN', 'KR')
@@ -433,7 +558,7 @@ def result(request):
     blue_duo=[]
     blue_count=[]
     result_df = []
-    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
+#    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
     for i in blue_team:
         blue_duo_2=[]
         blue_count_2=[]
@@ -549,12 +674,17 @@ def result(request):
             include_plotlyjs='cdn',
             div_id=f'THIS_IS_FIGID{chart_num}'
         ))
+    temp_chart_code.append(create_power_graph(power_graph(blue_team)))
+    temp_chart_code.append(create_power_graph(power_graph(red_team)))
+
+    test=power_df
 
     context = {
         'champions': selected_champions,
         'stats': stats,
         'temp_chart_code': temp_chart_code,
-        "value": result_df
+        "value": result_df,
+        "test":test
     }
     return render(request, 'mainapp/result.html', context)
 
