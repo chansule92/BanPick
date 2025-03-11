@@ -10,7 +10,7 @@ import plotly.express as px
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
- WHERE Ver in ('v15.1','v15.2','v15.3','v15.4')"""
+ WHERE Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5')"""
 
 game_list_df = pd.read_sql(game_list_query, connection)
 
@@ -76,14 +76,14 @@ SELECT M1.Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
                                       UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
                                   ) A
                             GROUP BY Champion
                          ) T1
@@ -100,7 +100,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
                                   ) A
                                   LEFT OUTER JOIN
                                   ( SELECT A.Game_ID
@@ -110,7 +110,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
                                   ) B
                                ON A.Game_ID = B.Game_ID
                               AND A.Champion != B.Champion
@@ -126,7 +126,7 @@ SELECT M1.Champion
                              FROM a_game_stat A
                                   INNER JOIN a_game B
                                ON A.Game_ID = B.Game_ID
-                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4') 
+                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
                             GROUP BY A.Champion
                          ) T3
                       ON T1.Champion = T3.Champion
@@ -152,10 +152,62 @@ query2="""SELECT B.Champion
     ON A.game_ID = B.Game_ID
    AND A.Team_Div = B.Team_Div
    AND A.ROLE = B.Role
- WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4')) """
+ WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')) """
 df2 = pd.read_sql(query2, connection)
 df2['Champion'] = df2['Champion'].str.lower()
 
+query3="""
+SELECT F.Champion
+     , F.avg_dpm * Ad_rate AS AD_p
+     , F.avg_dpm * AP_rate AS AP_p
+     , F.avg_dpm * TD_rate AS TD_p
+     , F.avg_dpm
+     , F.tank_death
+     , F.tank_time
+     , F.deal_death
+     , F.deal_time
+  FROM ( SELECT CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end AS Champion
+              , round(avg(A.DPM),2) AS avg_dpm
+              , round(SUM(A.`Physical Damage`) / SUM(A.`Total damage to Champion`),2) AS AD_rate
+              , round(SUM(A.`Magic Damage`) / SUM(A.`Total damage to Champion`) ,2) AS AP_rate
+              , round(SUM(A.`True Damage`) / SUM(A.`Total damage to Champion`) ,2) AS TD_rate
+              , SUM(CASE WHEN A.ROLE = 'JUNGLE' THEN A.`Total damage taken` * 0.7 ELSE A.`Total damage taken` END) / (SUM(A.Deaths) + count(A.Champion))  AS tank_death
+              , avg(ROUND(CASE WHEN A.ROLE = 'JUNGLE' THEN A.`Total damage taken` * 0.7 ELSE A.`Total damage taken` END / ROUND((LEFT(B.Game_Time,2)*60 + RIGHT(B.Game_Time,2)) / 60,2))) AS tank_time
+              , SUM(A.`Total damage to Champion`) / (SUM(A.Deaths) + count(A.Champion))  AS deal_death
+              , round(avg(A.DPM),2) AS deal_time
+           FROM a_game_stat A
+                INNER JOIN a_game B
+             ON A.Game_ID = B.Game_ID 
+          WHERE B.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')
+          GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
+       ) F
+"""
+sql2 = """
+SELECT A.Game_ID 
+     , B.Champion 
+     , B.Team_Div 
+     , B.Role
+     , A.Blue_Result 
+     , A.Red_Result 
+  FROM a_game A
+       INNER JOIN 
+       a_game_stat B
+    ON A.Game_ID = B.Game_ID 
+ WHERE A.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')
+"""
+dmg_rate_df=pd.read_sql_query(query3,connection)
+dmg_rate_df['Champion'] = dmg_rate_df['Champion'].str.lower()
+avg_tank_death = dmg_rate_df['tank_death'].sum()/dmg_rate_df['tank_death'].count()
+avg_tank_time = dmg_rate_df['tank_time'].sum()/dmg_rate_df['tank_time'].count()
+dmg_rate_df['tank_death_norm']=dmg_rate_df['tank_death']/avg_tank_death
+dmg_rate_df['tank_time_norm']=dmg_rate_df['tank_time']/avg_tank_time
+dmg_rate_df['tank_norm_total'] = dmg_rate_df['tank_death_norm'] + dmg_rate_df['tank_time_norm']
+avg_deal_death = dmg_rate_df['deal_death'].sum()/dmg_rate_df['deal_death'].count()
+avg_deal_time = dmg_rate_df['deal_time'].sum()/dmg_rate_df['deal_time'].count()
+dmg_rate_df['deal_death_norm']=dmg_rate_df['deal_death']/avg_deal_death
+dmg_rate_df['deal_time_norm']=dmg_rate_df['deal_time']/avg_deal_time
+dmg_rate_df['deal_norm_total'] = dmg_rate_df['deal_death_norm'] + dmg_rate_df['deal_time_norm']
+dmg_rate_df['Champion']=dmg_rate_df['Champion'].str.lower()
 
 df_list=[]
 for game in game_list_df['Game_ID'].values:
@@ -519,6 +571,120 @@ def create_power_graph(power_data):
             div_id='THIS_IS_FIGID'+str(random.random())))
     return chart_code
 
+def dmg_weight(cham_list):
+    dmg_weight = []
+    cham_list[-1]=cham_list[-1]+'_support'
+    for i in cham_list:
+        deal_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['deal_norm_total'].iloc[0]
+        tank_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['tank_norm_total'].iloc[0]
+        champ_name = i.replace('_support', '')  # '_support' 자동 제거
+        dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
+    
+    # 'Attack'이 'Defence' 위로 표시되도록 순서 조정
+    attribute = ['Defence', 'Attack']
+    
+    # 총합 계산
+    total_attack = round(sum([item[1] for item in dmg_weight]),2)
+    total_defence = round(sum([item[2] for item in dmg_weight]),2)
+    
+    # 공격과 방어 데이터를 각각 [공격, 방어] 순으로 저장
+    values = [[round(item[2], 1), round(item[1], 1)] for item in dmg_weight]
+    ratios = [[round(item[2]/total_attack*100, 2), round(item[1]/total_defence*100, 2)] for item in dmg_weight]
+    
+    # 'Attack'이 첫 번째, 'Defence'가 두 번째로 위치하도록 값 순서 재배열
+    values = [[v[0], v[1]] for v in values]
+    ratios = [[r[0], r[1]] for r in ratios]
+    
+    # 포지션 및 색상 설정
+    colors = ['#FF6F61', '#7DCEA0', '#5DADE2', '#AF7AC5', '#F4D03F']
+    
+    fig = go.Figure()
+    
+    # 스택형 바 차트 생성
+    for i, (champ, color) in enumerate(zip(dmg_weight, colors)):
+        fig.add_trace(go.Bar(
+            y=attribute,
+            x=[values[i][0], values[i][1]],  # 공격, 방어 순으로 값 적용
+            name=champ[0],
+            orientation='h',
+            marker=dict(color=color),
+            text=[
+                f'{champ[0]} <br> ({ratios[i][0]}%)',  # Attack
+                f'{champ[0]} <br> ({ratios[i][1]}%)'   # Defence
+            ],
+            textposition='inside',
+            insidetextanchor='middle'
+        ))
+    max_value = max(total_attack, total_defence)
+    # 레이아웃 설정
+    fig.update_layout(
+        barmode='stack',
+        title='Team Deal & Tank ratio',
+        template='plotly_dark',
+        plot_bgcolor='#0a0e21',
+        paper_bgcolor='#0a0e21',
+        font=dict(color='white'),
+        showlegend=False,  # 범례 숨김
+        height=400
+    )
+    for i, attr in enumerate(attribute):  # Attack / Defence 각각 처리
+        total_value = total_attack if attr == 'Attack' else total_defence
+        fig.add_annotation(
+            x=max_value * 1.02,  # 바 끝보다 살짝 오른쪽
+            y=i+0.3,  # 해당 바의 y 위치
+            text=f"Total: {total_value}",  # 표시할 텍스트
+            showarrow=False,  # 화살표 제거
+            font=dict(color="white", size=14, family="Arial", weight="bold"),
+            bgcolor="rgba(0, 0, 0, 0.5)",  # 배경 투명한 검은색으로 가독성 증가
+        )
+    
+    chart_code=(fig.to_html(
+            full_html=False,
+            include_plotlyjs='cdn',
+            div_id='THIS_IS_FIGID'+str(random.random())))
+    return chart_code
+
+def damage_distribution(champion_list):
+    # 챔피언 필터링
+    champion_list[-1]=champion_list[-1]+'_support'
+    selected_df = dmg_rate_df[dmg_rate_df['Champion'].isin(champion_list)]
+    
+    # 총합 계산
+    total_AD_p = selected_df['AD_p'].sum()
+    total_AP_p = selected_df['AP_p'].sum()
+    total_TD_p = selected_df['TD_p'].sum()
+    
+    # 데이터 준비
+    values = [total_AD_p, total_AP_p, total_TD_p]
+    labels = ['AD', 'AP', 'True Damage']
+    colors = ['#FF6F61', '#5DADE2', '#F4D03F']  # AD(빨강), AP(파랑), TD(노랑)
+
+    # 파이 차트 생성
+    fig = go.Figure(data=[go.Pie(
+        labels=labels,
+        values=values,
+        textinfo='label+percent',
+        insidetextorientation='radial',
+        marker=dict(colors=colors)
+    )])
+
+    # 레이아웃 설정
+    fig.update_layout(
+        title="Damage Type Distribution",
+        plot_bgcolor='#0a0e21',
+        paper_bgcolor='#0a0e21',
+        font=dict(color='white'),
+        showlegend=False,
+        width=500,  # 너비 조절
+        height=400  # 높이 조절
+    )
+
+    chart_code=(fig.to_html(
+            full_html=False,
+            include_plotlyjs='cdn',
+            div_id='THIS_IS_FIGID'+str(random.random())))
+    return chart_code
+
 def index(request):
     student_information = champion_index.objects.values('EN', 'KR')
     pick = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
@@ -676,7 +842,10 @@ def result(request):
         ))
     temp_chart_code.append(create_power_graph(power_graph(blue_team)))
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
-
+    temp_chart_code.append(dmg_weight(blue_team))
+    temp_chart_code.append(dmg_weight(red_team))
+    temp_chart_code.append(damage_distribution(blue_team))
+    temp_chart_code.append(damage_distribution(red_team))
     test=power_df
 
     context = {
