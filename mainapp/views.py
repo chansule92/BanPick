@@ -16,7 +16,6 @@ game_list_df = pd.read_sql(game_list_query, connection)
 
 
 game_list=game_list_df['Game_ID'].to_list()
-result={}
 Team_div = ['BLUE','RED']
 Position_div = ['TOP','JUNGLE','MID','ADC','SUPPORT']
 result={}
@@ -209,130 +208,6 @@ dmg_rate_df['deal_time_norm']=dmg_rate_df['deal_time']/avg_deal_time
 dmg_rate_df['deal_norm_total'] = dmg_rate_df['deal_death_norm'] + dmg_rate_df['deal_time_norm']
 dmg_rate_df['Champion']=dmg_rate_df['Champion'].str.lower()
 
-df_list=[]
-for game in game_list_df['Game_ID'].values:
-    Blue_Team=result[game]['BLUE'][0]
-    Red_Team=result[game]['RED'][0]
-    blue_temp_list=[]
-    for k in Blue_Team:
-        k=k.lower()
-        try:
-            Ban=max(df[df['Champion']==k]['Ban'])
-        except ValueError:
-            Ban=0
-        try:
-            Pick=max(df[df['Champion']==k]['Pick'])
-        except ValueError:
-            Pick=0
-        try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
-        except ValueError:
-            Win_rate=50
-        Duo_score=0
-        Count_score=0
-        for i in Blue_Team:
-            i=i.lower()
-            if k==i:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        Duo_score = Duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
-                    except IndexError:
-                        Duo_score = 0
-        for j in Red_Team:
-            j=j.lower()
-            if k==j:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        Count_score = Count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
-                    except IndexError:
-                        Count_score = 0
-        blue_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
-    sum1=0
-    sum2=0
-    sum3=0
-    sum4=0
-    sum5=0
-    for i in blue_temp_list:
-        sum1+=i[0]
-        sum2+=i[1]
-        sum3+=i[2]
-        sum4+=i[3]
-        sum5+=i[4]
-    red_temp_list=[]
-    for k in Red_Team:
-        k=k.lower()
-        try:
-            Ban=max(df[df['Champion']==k]['Ban'])
-        except ValueError:
-            Ban=0
-        try:
-            Pick=max(df[df['Champion']==k]['Pick'])
-        except ValueError:
-            Pick=0
-        try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
-        except ValueError:
-            Win_rate=50
-        Duo_score=0
-        Count_score=0
-        for i in Red_Team:
-            i=i.lower()
-            if k==i:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        Duo_score = Duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
-                    except IndexError:
-                        Duo_score = 0
-        for j in Blue_Team:
-            j=j.lower()
-            if k==j:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        Count_score = Count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
-                    except IndexError:
-                        Count_score = 0
-        red_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
-    sum6=0
-    sum7=0
-    sum8=0
-    sum9=0
-    sum10=0
-    for i in red_temp_list:
-        sum6+=i[0]
-        sum7+=i[1]
-        sum8+=i[2]
-        sum9+=i[3]
-        sum10+=i[4]
-    if result[game]['BLUE'][1] == 'WIN':
-        game_result=1
-    else :
-        game_result=0
-    result_list=[sum3,sum4,sum5,sum8,sum9,sum10,game_result]
-    df_list.append(result_list)
-df_list
-final_df=pd.DataFrame(df_list)
-final_df.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore','Result']
-features=final_df[['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']]
-result=final_df['Result']
-
-
-
 
 cham_powergraph=[]
 champion_list=df2['Champion'].unique()
@@ -361,26 +236,10 @@ for cham in champion_list:
 power_df=pd.DataFrame(cham_powergraph)
 power_df.columns = ['Champion','Gold_Data']
 
-"""
-from sklearn.model_selection import train_test_split
-
-train_features, test_features, train_labels, test_labels = train_test_split(features, result)
-
-from sklearn.preprocessing import StandardScaler
-
-scaler = StandardScaler()
-
-train_features = scaler.fit_transform(train_features)
-test_features = scaler.transform(test_features)
-
-from sklearn.linear_model import LogisticRegression
-
-model = LogisticRegression()
-model.fit(train_features, train_labels)
-
 def process_teams(Blue_Team, Red_Team):
     blue_temp_list=[]
     for k in Blue_Team:
+        k=k.lower()
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
@@ -396,6 +255,7 @@ def process_teams(Blue_Team, Red_Team):
         Duo_score=0
         Count_score=0
         for i in Blue_Team:
+            i=i.lower()
             if k==i:
                 pass
             else :
@@ -407,6 +267,7 @@ def process_teams(Blue_Team, Red_Team):
                     except IndexError:
                         Duo_score = 0
         for j in Red_Team:
+            j=j.lower()
             if k==j:
                 pass
             else :
@@ -432,6 +293,7 @@ def process_teams(Blue_Team, Red_Team):
         sum5+=i[4]
     red_temp_list=[]
     for k in Red_Team:
+        k=k.lower()
         try:
             Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
@@ -447,6 +309,7 @@ def process_teams(Blue_Team, Red_Team):
         Duo_score=0
         Count_score=0
         for i in Red_Team:
+            i=i.lower()
             if k==i:
                 pass
             else :
@@ -458,6 +321,7 @@ def process_teams(Blue_Team, Red_Team):
                     except IndexError:
                         Duo_score = 0
         for j in Blue_Team:
+            j=j.lower()
             if k==j:
                 pass
             else :
@@ -484,10 +348,15 @@ def process_teams(Blue_Team, Red_Team):
     result
     features=pd.DataFrame(result)
     features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
-    ml_features=scaler.transform(features)
-    result=model.predict_proba(ml_features)
-    return [round(result[0][0]*100,2),round(result[0][1]*100,2),features]
-"""
+    return features
+
+def count_carry_lines(dmg_ratios):
+    return sum([1 for d in dmg_ratios if d >= 0.16])
+
+def count_tank_lines(dmg_ratios):
+    return sum([1 for d in dmg_ratios if d >= 0.18])
+
+
 def power_graph(Cham_list):
     powerdata_list=[]
     for i in Cham_list:
@@ -575,11 +444,27 @@ def dmg_weight(cham_list):
     dmg_weight = []
     cham_list[-1]=cham_list[-1]+'_support'
     for i in cham_list:
-        deal_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['deal_norm_total'].iloc[0]
-        tank_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['tank_norm_total'].iloc[0]
+        i=i.lower()
+        if len(dmg_rate_df[dmg_rate_df['Champion'] == i])==0:
+            deal_norm_total=0
+            tank_norm_total=0
+        else:
+            deal_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['deal_norm_total'].iloc[0]
+            tank_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['tank_norm_total'].iloc[0]
         champ_name = i.replace('_support', '')  # '_support' 자동 제거
         dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
+    return dmg_weight
+
+
+for game in game_list_df['Game_ID'].values:
+    Blue_Team=result[game]['BLUE'][0]
+    Red_Team=result[game]['RED'][0]
+    abc=pd.DataFrame(process_teams(Blue_Team,Red_Team))
+
+
+
     
+def dmg_weight_chart(dmg_weight):
     # 'Attack'이 'Defence' 위로 표시되도록 순서 조정
     attribute = ['Defence', 'Attack']
     
@@ -684,6 +569,118 @@ def damage_distribution(champion_list):
             include_plotlyjs='cdn',
             div_id='THIS_IS_FIGID'+str(random.random())))
     return chart_code
+
+ml_df=[]
+for i in game_list:
+    temp_result=[]
+    ml_temp_df=process_teams(result[i]['BLUE'][0],result[i]['RED'][0])
+    if result[i]['BLUE'][1] == 'WIN':
+        ml_game_result=1
+    else:
+        ml_game_result=0
+    ml_temp_blue_df=dmg_weight(result[i]['BLUE'][0])
+    ml_temp_red_df=dmg_weight(result[i]['RED'][0])
+    blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
+    blue_total_def = sum([item[2] for item in ml_temp_blue_df])
+    red_total_atk = sum([item[1] for item in ml_temp_red_df])
+    red_total_def = sum([item[2] for item in ml_temp_red_df])
+    blue_temp_atk=[]
+    blue_temp_def=[]
+    red_temp_atk=[]
+    red_temp_def=[]
+    for blue_i in ml_temp_blue_df:
+        blue_temp_atk.append(blue_i[1]/blue_total_atk)
+        blue_temp_def.append(blue_i[2]/blue_total_def)
+    for red_i in ml_temp_red_df:
+        red_temp_atk.append(red_i[1]/red_total_atk)
+        red_temp_def.append(red_i[2]/red_total_def)
+    blue_atk_cnt=count_carry_lines(blue_temp_atk)
+    blue_def_cnt=count_tank_lines(blue_temp_def)
+    red_atk_cnt=count_carry_lines(red_temp_atk)
+    red_def_cnt=count_tank_lines(red_temp_def)
+    ml_temp_df2=pd.DataFrame([[blue_total_atk,blue_total_def,blue_atk_cnt,blue_def_cnt,red_total_atk,red_total_def,red_atk_cnt,red_def_cnt,ml_game_result]])
+    ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
+    if len(ml_df)==0:
+        ml_df=ml_temp_df3
+    else:
+        ml_df=pd.concat([ml_df,ml_temp_df3],axis=0)
+ml_df.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore','blue_total_atk','blue_total_def','blue_atk_cnt','blue_def_cnt','red_total_atk','red_total_def','red_atk_cnt','red_def_cnt','game_result']
+test_df=pd.DataFrame(list((ml_df['Blue_Winrate']-ml_df['Red_Winrate'])+(ml_df['Blue_Duoscore']-ml_df['Red_Duoscore'])+(ml_df['Blue_Countscore']-ml_df['Red_Countscore'])))
+test_df.columns = ['comb_score']
+test_df = test_df.reset_index(drop=True)
+ml_df = ml_df.reset_index(drop=True)
+test_df['over_atk']=ml_df['blue_total_atk']-ml_df['red_total_def']
+test_df['over_def']=ml_df['blue_total_def']-ml_df['red_total_atk']
+test_df['DT_comb']=(ml_df['blue_total_atk']/ml_df['blue_total_def']) - (ml_df['red_total_atk']/ml_df['red_total_def'])
+test_df['atk_cnt']=ml_df['blue_atk_cnt']-ml_df['red_atk_cnt']
+test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
+features=test_df
+features_result=ml_df[['game_result']]
+import xgboost as xgb
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score, roc_auc_score
+X= features
+y= features_result
+params = {
+    'objective': 'binary:logistic',  # 이진 분류
+    'eval_metric': 'logloss',        # 평가 지표
+    'max_depth': 4,
+    'eta': 0.1,
+    'subsample': 0.8,
+    'colsample_bytree': 0.8,
+    'seed': 42,
+    'verbosity': 0
+}
+
+# (3) KFold 설정
+kf = KFold(n_splits=5, shuffle=True, random_state=42)
+
+# (4) 교차검증 수행
+fold = 1
+acc_scores = []
+auc_scores = []
+
+for train_idx, val_idx in kf.split(X):
+    X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
+    y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
+    
+    model = xgb.XGBClassifier(n_estimators=100)
+    model.fit(X_train, y_train,
+              eval_set=[(X_val, y_val)],
+              verbose=False)
+    
+    y_pred = model.predict(X_val)
+    y_pred_prob = model.predict_proba(X_val)[:, 1]
+    
+    acc = accuracy_score(y_val, y_pred)
+    auc = roc_auc_score(y_val, y_pred_prob)
+    
+    print(f"Fold {fold} | Accuracy: {acc:.4f} | AUC: {auc:.4f}")
+    acc_scores.append(acc)
+    auc_scores.append(auc)
+    fold += 1
+
+# (5) 최종 평균 성능
+print("\n==== 최종 평균 성능 ====")
+print(f"Average Accuracy: {np.mean(acc_scores):.4f}")
+print(f"Average AUC: {np.mean(auc_scores):.4f}")
+"""
+from sklearn.model_selection import train_test_split
+
+train_features, test_features, train_labels, test_labels = train_test_split(features, result)
+
+from sklearn.preprocessing import StandardScaler
+
+scaler = StandardScaler()
+
+train_features = scaler.fit_transform(train_features)
+test_features = scaler.transform(test_features)
+
+from sklearn.linear_model import LogisticRegression
+
+model = LogisticRegression()
+model.fit(train_features, train_labels)
+"""
 
 def index(request):
     student_information = champion_index.objects.values('EN', 'KR')
@@ -842,8 +839,8 @@ def result(request):
         ))
     temp_chart_code.append(create_power_graph(power_graph(blue_team)))
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
-    temp_chart_code.append(dmg_weight(blue_team))
-    temp_chart_code.append(dmg_weight(red_team))
+    temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
+    temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
     temp_chart_code.append(damage_distribution(blue_team))
     temp_chart_code.append(damage_distribution(red_team))
     test=power_df
