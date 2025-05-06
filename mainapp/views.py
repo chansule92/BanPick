@@ -350,6 +350,155 @@ def process_teams(Blue_Team, Red_Team):
     features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
     return features
 
+def duo_chart(blue_team):
+    blue_duo=[]
+    for i in blue_team:
+        blue_duo_2=[]
+        for j in blue_team:
+            if i!=j:
+                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
+                    blue_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
+                else :
+                    blue_duo_2.append(0)
+            else:
+                blue_duo_2.append(0)
+        blue_duo.append(blue_duo_2)
+    custom_colorscale = [
+        [0, '#FF6384'],      # 최소값
+        [0.5, 'white'],      # 중간값 (0)
+        [1, '#36A2EB']       # 최대값
+    ]
+    temp_chart_code = []
+    temp_data=np.array(blue_duo)
+    temp_df=pd.DataFrame(temp_data)
+    temp_df.index = blue_team
+    temp_df.columns = blue_team
+    fig = go.Figure(data=go.Heatmap(
+        z=temp_df.values,
+        x=temp_df.columns,
+        y=temp_df.index,
+        text=temp_df.values,
+        texttemplate='%{text:.1f}',
+        textfont={"size": 11,"family":"Arial"},
+        colorscale=custom_colorscale,
+        zmid=0,
+        zmin=-50,
+        zmax=50,
+        showscale=True,
+        xgap=3,  # x축 방향 간격 (픽셀)
+        ygap=3   # y축 방향 간격 (픽셀)
+    ))
+
+    # 레이아웃 설정
+    fig.update_layout(
+        paper_bgcolor='#0a0e21',  # 전체 배경색
+        plot_bgcolor='#1d1e33',   # 플롯 배경색
+        width=500,                # figsize=(5, 3)과 비슷한 크기
+        height=300,
+        margin=dict(l=50, r=50, t=50, b=30),
+        font=dict(
+            family='Arial',
+            color='white'         # 텍스트 색상
+        ),
+        xaxis=dict(
+            side='top',  # x축을 위에 표시
+            showgrid=False,
+            showline=False,
+            tickfont=dict(family="Arial")
+        ),
+        yaxis=dict(
+            autorange='reversed',  # Y축 역순 설정
+            showgrid=False,
+            showline=False,
+            tickfont=dict(family="Arial")
+        )
+    )
+
+    # x축, y축 설정
+    fig.update_xaxes(showgrid=False, showline=False)
+    fig.update_yaxes(showgrid=False, showline=False)
+
+    # HTML로 변환하여 저장
+    temp_chart_code.append(fig.to_html(
+        full_html=False,
+        include_plotlyjs='cdn',
+        div_id=f'THIS_IS_FIGID'+str(random.random())
+    ))
+    return temp_chart_code[0]
+
+def count_chart(blue_team,red_team):
+    blue_count=[]
+    for i in blue_team:
+        blue_count_2=[]
+        for k in red_team:
+            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
+                blue_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
+            else :
+                blue_count_2.append(0)
+        blue_count.append(blue_count_2)
+    custom_colorscale = [
+        [0, '#FF6384'],      # 최소값
+        [0.5, 'white'],      # 중간값 (0)
+        [1, '#36A2EB']       # 최대값
+    ]
+    temp_chart_code = []
+    temp_data=np.array(blue_count)
+    temp_df=pd.DataFrame(temp_data)
+    temp_df.index = blue_team
+    temp_df.columns = red_team
+    fig = go.Figure(data=go.Heatmap(
+        z=temp_df.values,
+        x=temp_df.columns,
+        y=temp_df.index,
+        text=temp_df.values,
+        texttemplate='%{text:.1f}',
+        textfont={"size": 11,"family":"Arial"},
+        colorscale=custom_colorscale,
+        zmid=0,
+        zmin=-50,
+        zmax=50,
+        showscale=True,
+        xgap=3,  # x축 방향 간격 (픽셀)
+        ygap=3   # y축 방향 간격 (픽셀)
+    ))
+
+    # 레이아웃 설정
+    fig.update_layout(
+        paper_bgcolor='#0a0e21',  # 전체 배경색
+        plot_bgcolor='#1d1e33',   # 플롯 배경색
+        width=500,                # figsize=(5, 3)과 비슷한 크기
+        height=300,
+        margin=dict(l=50, r=50, t=50, b=30),
+        font=dict(
+            family='Arial',
+            color='white'         # 텍스트 색상
+        ),
+        xaxis=dict(
+            side='top',  # x축을 위에 표시
+            showgrid=False,
+            showline=False,
+            tickfont=dict(family="Arial")
+        ),
+        yaxis=dict(
+            autorange='reversed',  # Y축 역순 설정
+            showgrid=False,
+            showline=False,
+            tickfont=dict(family="Arial")
+        )
+    )
+
+    # x축, y축 설정
+    fig.update_xaxes(showgrid=False, showline=False)
+    fig.update_yaxes(showgrid=False, showline=False)
+
+    # HTML로 변환하여 저장
+    temp_chart_code.append(fig.to_html(
+        full_html=False,
+        include_plotlyjs='cdn',
+        div_id=f'THIS_IS_FIGID'+str(random.random())
+    ))
+    return temp_chart_code[0]
+
 def count_carry_lines(dmg_ratios):
     return sum([1 for d in dmg_ratios if d >= 0.16])
 
@@ -453,6 +602,7 @@ def dmg_weight(cham_list):
             tank_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['tank_norm_total'].iloc[0]
         champ_name = i.replace('_support', '')  # '_support' 자동 제거
         dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
+    cham_list[-1]=cham_list[-1].replace('_support','')
     return dmg_weight
 
     
@@ -530,7 +680,7 @@ def damage_distribution(champion_list):
     total_AD_p = selected_df['AD_p'].sum()
     total_AP_p = selected_df['AP_p'].sum()
     total_TD_p = selected_df['TD_p'].sum()
-    
+    champion_list[-1] = champion_list[-1].replace('_support', '')
     # 데이터 준비
     values = [total_AD_p, total_AP_p, total_TD_p]
     labels = ['AD', 'AP', 'True Damage']
@@ -562,16 +712,11 @@ def damage_distribution(champion_list):
             div_id='THIS_IS_FIGID'+str(random.random())))
     return chart_code
 
-ml_df=[]
-for i in game_list:
-    temp_result=[]
-    ml_temp_df=process_teams(result[i]['BLUE'][0],result[i]['RED'][0])
-    if result[i]['BLUE'][1] == 'WIN':
-        ml_game_result=1
-    else:
-        ml_game_result=0
-    ml_temp_blue_df=dmg_weight(result[i]['BLUE'][0])
-    ml_temp_red_df=dmg_weight(result[i]['RED'][0])
+
+def ml_features(blue_team,red_team):
+    ml_temp_df=process_teams(blue_team,red_team)
+    ml_temp_blue_df=dmg_weight(blue_team)
+    ml_temp_red_df=dmg_weight(red_team)
     blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
     blue_total_def = sum([item[2] for item in ml_temp_blue_df])
     red_total_atk = sum([item[1] for item in ml_temp_red_df])
@@ -590,23 +735,37 @@ for i in game_list:
     blue_def_cnt=count_tank_lines(blue_temp_def)
     red_atk_cnt=count_carry_lines(red_temp_atk)
     red_def_cnt=count_tank_lines(red_temp_def)
-    ml_temp_df2=pd.DataFrame([[blue_total_atk,blue_total_def,blue_atk_cnt,blue_def_cnt,red_total_atk,red_total_def,red_atk_cnt,red_def_cnt,ml_game_result]])
+    ml_temp_df2=pd.DataFrame([[blue_total_atk,blue_total_def,blue_atk_cnt,blue_def_cnt,red_total_atk,red_total_def,red_atk_cnt,red_def_cnt]])
+    ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
+    ml_df=ml_temp_df3
+    ml_df.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore','blue_total_atk','blue_total_def','blue_atk_cnt','blue_def_cnt','red_total_atk','red_total_def','red_atk_cnt','red_def_cnt']
+    test_df=pd.DataFrame(list((ml_df['Blue_Winrate']-ml_df['Red_Winrate'])+(ml_df['Blue_Duoscore']-ml_df['Red_Duoscore'])+(ml_df['Blue_Countscore']-ml_df['Red_Countscore'])))
+    test_df.columns = ['comb_score']
+    test_df = test_df.reset_index(drop=True)
+    ml_df = ml_df.reset_index(drop=True)
+    test_df['over_atk']=ml_df['blue_total_atk']-ml_df['red_total_def']
+    test_df['over_def']=ml_df['blue_total_def']-ml_df['red_total_atk']
+    test_df['DT_comb']=(ml_df['blue_total_atk']/ml_df['blue_total_def']) - (ml_df['red_total_atk']/ml_df['red_total_def'])
+    test_df['atk_cnt']=ml_df['blue_atk_cnt']-ml_df['red_atk_cnt']
+    test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
+    features=test_df
+    return features
+
+ml_df=[]
+for i in game_list:
+    ml_temp_df=ml_features(result[i]['BLUE'][0],result[i]['RED'][0])
+    if result[i]['BLUE'][1] == 'WIN':
+        ml_game_result=[1]
+    else:
+        ml_game_result=[0]
+    ml_temp_df2=pd.DataFrame(ml_game_result)    
+    ml_temp_df2.columns=['game_result']
     ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
     if len(ml_df)==0:
         ml_df=ml_temp_df3
     else:
         ml_df=pd.concat([ml_df,ml_temp_df3],axis=0)
-ml_df.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore','blue_total_atk','blue_total_def','blue_atk_cnt','blue_def_cnt','red_total_atk','red_total_def','red_atk_cnt','red_def_cnt','game_result']
-test_df=pd.DataFrame(list((ml_df['Blue_Winrate']-ml_df['Red_Winrate'])+(ml_df['Blue_Duoscore']-ml_df['Red_Duoscore'])+(ml_df['Blue_Countscore']-ml_df['Red_Countscore'])))
-test_df.columns = ['comb_score']
-test_df = test_df.reset_index(drop=True)
-ml_df = ml_df.reset_index(drop=True)
-test_df['over_atk']=ml_df['blue_total_atk']-ml_df['red_total_def']
-test_df['over_def']=ml_df['blue_total_def']-ml_df['red_total_atk']
-test_df['DT_comb']=(ml_df['blue_total_atk']/ml_df['blue_total_def']) - (ml_df['red_total_atk']/ml_df['red_total_def'])
-test_df['atk_cnt']=ml_df['blue_atk_cnt']-ml_df['red_atk_cnt']
-test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
-features=test_df
+features=ml_df[['comb_score','over_atk','over_def','DT_comb','atk_cnt','def_cnt']]
 features_result=ml_df[['game_result']]
 import xgboost as xgb
 from sklearn.model_selection import KFold
@@ -656,6 +815,8 @@ for train_idx, val_idx in kf.split(X):
 print("\n==== 최종 평균 성능 ====")
 print(f"Average Accuracy: {np.mean(acc_scores):.4f}")
 print(f"Average AUC: {np.mean(auc_scores):.4f}")
+final_model = xgb.XGBClassifier(n_estimators=100, **params)
+final_model.fit(X, y)
 """
 from sklearn.model_selection import train_test_split
 
@@ -710,125 +871,14 @@ def result(request):
         else:
             red_team.append(i.replace('%20',' '))
         count=count+1
-    blue_duo=[]
-    blue_count=[]
-    result_df = []
-#    result_df = process_teams(blue_team, red_team)  # Replace this with your existing logic to process the teams
-    for i in blue_team:
-        blue_duo_2=[]
-        blue_count_2=[]
-        for j in blue_team:
-            if i!=j:
-                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
-                    blue_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
-                else :
-                    blue_duo_2.append(0)
-            else:
-                blue_duo_2.append(0)
-        blue_duo.append(blue_duo_2)
-        for k in red_team:
-            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
-                blue_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
-            else :
-                blue_count_2.append(0)
-        blue_count.append(blue_count_2)
-    red_duo=[]
-    red_count=[]
-    for i in red_team:
-        red_duo_2=[]
-        red_count_2=[]
-        for j in red_team:
-            if i!=j:
-                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
-                    red_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
-                else :
-                    red_duo_2.append(0)
-            else:
-                red_duo_2.append(0)
-        red_duo.append(red_duo_2)
-        for k in blue_team:
-            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
-                red_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
-            else :
-                red_count_2.append(0)
-        red_count.append(red_count_2)
-    chart_num=0
-    custom_colorscale = [
-        [0, '#FF6384'],      # 최소값
-        [0.5, 'white'],      # 중간값 (0)
-        [1, '#36A2EB']       # 최대값
-    ]
+    pred = final_model.predict(ml_features(blue_team,red_team))
+    pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
+    result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
-    chart_num = -1  # 0부터 시작하도록 -1로 초기화
-
-    for i in [blue_duo, blue_count, red_duo, red_count]:
-        chart_num = chart_num + 1
-        temp_data = np.array(i)
-        temp_df = pd.DataFrame(temp_data)
-
-        # 열과 행 이름 설정
-        if chart_num in (0, 1):
-            temp_df.index = blue_team
-        else:
-            temp_df.index = red_team
-
-        if chart_num in (1, 2):
-            temp_df.columns = red_team
-        else:
-            temp_df.columns = blue_team
-
-        # Plotly figure 생성
-        fig = go.Figure(data=go.Heatmap(
-            z=temp_df.values,
-            x=temp_df.columns,
-            y=temp_df.index,
-            text=temp_df.values,
-            texttemplate='%{text:.1f}',
-            textfont={"size": 11,"family":"Arial"},
-            colorscale=custom_colorscale,
-            zmid=0,
-            zmin=-50,
-            zmax=50,
-            showscale=True,
-            xgap=3,  # x축 방향 간격 (픽셀)
-            ygap=3   # y축 방향 간격 (픽셀)
-        ))
-
-        # 레이아웃 설정
-        fig.update_layout(
-            paper_bgcolor='#0a0e21',  # 전체 배경색
-            plot_bgcolor='#1d1e33',   # 플롯 배경색
-            width=500,                # figsize=(5, 3)과 비슷한 크기
-            height=300,
-            margin=dict(l=50, r=50, t=50, b=30),
-            font=dict(
-                family='Arial',
-                color='white'         # 텍스트 색상
-            ),
-            xaxis=dict(
-                side='top',  # x축을 위에 표시
-                showgrid=False,
-                showline=False,
-                tickfont=dict(family="Arial")
-            ),
-            yaxis=dict(
-                autorange='reversed',  # Y축 역순 설정
-                showgrid=False,
-                showline=False,
-                tickfont=dict(family="Arial")
-            )
-        )
-
-        # x축, y축 설정
-        fig.update_xaxes(showgrid=False, showline=False)
-        fig.update_yaxes(showgrid=False, showline=False)
-
-        # HTML로 변환하여 저장
-        temp_chart_code.append(fig.to_html(
-            full_html=False,
-            include_plotlyjs='cdn',
-            div_id=f'THIS_IS_FIGID{chart_num}'
-        ))
+    temp_chart_code.append(duo_chart(blue_team))
+    temp_chart_code.append(count_chart(blue_team,red_team))
+    temp_chart_code.append(duo_chart(red_team))
+    temp_chart_code.append(count_chart(red_team,blue_team))
     temp_chart_code.append(create_power_graph(power_graph(blue_team)))
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
