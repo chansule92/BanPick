@@ -455,14 +455,6 @@ def dmg_weight(cham_list):
         dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
     return dmg_weight
 
-
-for game in game_list_df['Game_ID'].values:
-    Blue_Team=result[game]['BLUE'][0]
-    Red_Team=result[game]['RED'][0]
-    abc=pd.DataFrame(process_teams(Blue_Team,Red_Team))
-
-
-
     
 def dmg_weight_chart(dmg_weight):
     # 'Attack'이 'Defence' 위로 표시되도록 순서 조정
