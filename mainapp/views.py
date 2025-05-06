@@ -10,7 +10,7 @@ import plotly.express as px
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM a_game
- WHERE Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5')"""
+ WHERE Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8')"""
 
 game_list_df = pd.read_sql(game_list_query, connection)
 
@@ -75,14 +75,14 @@ SELECT M1.Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8') 
                                       UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
                                        FROM a_game_ban A
                                             INNER JOIN a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
+                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8') 
                                   ) A
                             GROUP BY Champion
                          ) T1
@@ -99,7 +99,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8') 
                                   ) A
                                   LEFT OUTER JOIN
                                   ( SELECT A.Game_ID
@@ -109,7 +109,7 @@ SELECT M1.Champion
                                       FROM a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
+                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8') 
                                   ) B
                                ON A.Game_ID = B.Game_ID
                               AND A.Champion != B.Champion
@@ -125,7 +125,7 @@ SELECT M1.Champion
                              FROM a_game_stat A
                                   INNER JOIN a_game B
                                ON A.Game_ID = B.Game_ID
-                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5') 
+                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8') 
                             GROUP BY A.Champion
                          ) T3
                       ON T1.Champion = T3.Champion
@@ -151,7 +151,7 @@ query2="""SELECT B.Champion
     ON A.game_ID = B.Game_ID
    AND A.Team_Div = B.Team_Div
    AND A.ROLE = B.Role
- WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')) """
+ WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8')) """
 df2 = pd.read_sql(query2, connection)
 df2['Champion'] = df2['Champion'].str.lower()
 
@@ -177,7 +177,7 @@ SELECT F.Champion
            FROM a_game_stat A
                 INNER JOIN a_game B
              ON A.Game_ID = B.Game_ID 
-          WHERE B.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')
+          WHERE B.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8')
           GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
        ) F
 """
@@ -192,7 +192,7 @@ SELECT A.Game_ID
        INNER JOIN 
        a_game_stat B
     ON A.Game_ID = B.Game_ID 
- WHERE A.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5')
+ WHERE A.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8')
 """
 dmg_rate_df=pd.read_sql_query(query3,connection)
 dmg_rate_df['Champion'] = dmg_rate_df['Champion'].str.lower()
@@ -817,23 +817,6 @@ print(f"Average Accuracy: {np.mean(acc_scores):.4f}")
 print(f"Average AUC: {np.mean(auc_scores):.4f}")
 final_model = xgb.XGBClassifier(n_estimators=100, **params)
 final_model.fit(X, y)
-"""
-from sklearn.model_selection import train_test_split
-
-train_features, test_features, train_labels, test_labels = train_test_split(features, result)
-
-from sklearn.preprocessing import StandardScaler
-
-scaler = StandardScaler()
-
-train_features = scaler.fit_transform(train_features)
-test_features = scaler.transform(test_features)
-
-from sklearn.linear_model import LogisticRegression
-
-model = LogisticRegression()
-model.fit(train_features, train_labels)
-"""
 
 def index(request):
     student_information = champion_index.objects.values('EN', 'KR')
