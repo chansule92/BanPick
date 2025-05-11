@@ -373,6 +373,21 @@ def duo_chart(blue_team):
     temp_df=pd.DataFrame(temp_data)
     temp_df.index = blue_team
     temp_df.columns = blue_team
+    synergy_list=[]
+    for i in range(0,len(temp_data)):
+        for j in range(0,len(temp_data[i])) :
+            if temp_data[i][j] > 0:
+                if temp_data[4-i][4-j] > 0:
+                    if temp_data[i][j]+temp_data[j][i] > 10:
+                        synergy_list.append([blue_team[i],blue_team[j],temp_data[i][j]+temp_data[j][i]])
+    seen = set()
+    synergy = []
+    for champ1, champ2, value in synergy_list:
+        key = tuple(sorted([champ1, champ2]) + [round(value, 2)])
+        if key not in seen:
+            seen.add(key)
+            synergy.append([champ1, champ2, value])
+
     fig = go.Figure(data=go.Heatmap(
         z=temp_df.values,
         x=temp_df.columns,
@@ -424,7 +439,7 @@ def duo_chart(blue_team):
         include_plotlyjs='cdn',
         div_id=f'THIS_IS_FIGID'+str(random.random())
     ))
-    return temp_chart_code[0]
+    return [temp_chart_code[0],synergy]
 
 def count_chart(blue_team,red_team):
     blue_count=[]
@@ -446,6 +461,12 @@ def count_chart(blue_team,red_team):
     temp_df=pd.DataFrame(temp_data)
     temp_df.index = blue_team
     temp_df.columns = red_team
+    synergy_list=[]
+    for i in range(0,len(temp_data)):
+        for j in range(0,len(temp_data[i])) :
+            if temp_data[i][j] > 0:
+                if temp_data[i][j]+temp_data[j][i] > 10:
+                    synergy_list.append([blue_team[i],red_team[j],temp_data[i][j]+temp_data[j][i]])
     fig = go.Figure(data=go.Heatmap(
         z=temp_df.values,
         x=temp_df.columns,
@@ -497,7 +518,7 @@ def count_chart(blue_team,red_team):
         include_plotlyjs='cdn',
         div_id=f'THIS_IS_FIGID'+str(random.random())
     ))
-    return temp_chart_code[0]
+    return [temp_chart_code[0],synergy_list]
 
 def count_carry_lines(dmg_ratios):
     return sum([1 for d in dmg_ratios if d >= 0.16])
@@ -858,10 +879,10 @@ def result(request):
     pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
-    temp_chart_code.append(duo_chart(blue_team))
-    temp_chart_code.append(count_chart(blue_team,red_team))
-    temp_chart_code.append(duo_chart(red_team))
-    temp_chart_code.append(count_chart(red_team,blue_team))
+    temp_chart_code.append(duo_chart(blue_team)[0])
+    temp_chart_code.append(count_chart(blue_team,red_team)[0])
+    temp_chart_code.append(duo_chart(red_team)[0])
+    temp_chart_code.append(count_chart(red_team,blue_team)[0])
     temp_chart_code.append(create_power_graph(power_graph(blue_team)))
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
@@ -869,7 +890,8 @@ def result(request):
     temp_chart_code.append(damage_distribution(blue_team))
     temp_chart_code.append(damage_distribution(red_team))
     test=power_df
-
+    print(blue_team)
+    print(red_team)
     context = {
         'champions': selected_champions,
         'stats': stats,
@@ -879,4 +901,54 @@ def result(request):
     }
     return render(request, 'mainapp/result.html', context)
 
+
+def report(request):
+#    if request.method == 'POST':
+#        selected_champions = request.POST.getlist('champion')
+    stats = []
+#    for i in selected_champions:
+#        stats.append([df[df['Champion']==i.replace('%20',' ')]['Ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
+    temp_chart_code=[]
+    count=0
+    blue_team = []
+    red_team = []
+#    for i in selected_champions:
+#        if count < 5:
+#            blue_team.append(i.replace('%20',' '))
+#        else:
+#            red_team.append(i.replace('%20',' '))
+#        count=count+1
+    blue_team = ['rumble', 'naafiri', 'ahri', 'kaisa', 'leona']
+    red_team = ['gwen', 'pantheon', 'azir', 'jhin', 'rell']
+    pred = final_model.predict(ml_features(blue_team,red_team))
+    pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
+    result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
+    temp_chart_code = []
+    temp_chart_code.append(duo_chart(blue_team)[0])
+    temp_chart_code.append(count_chart(blue_team,red_team)[0])
+    temp_chart_code.append(duo_chart(red_team)[0])
+    temp_chart_code.append(count_chart(red_team,blue_team)[0])
+    temp_chart_code.append(create_power_graph(power_graph(blue_team)))
+    temp_chart_code.append(create_power_graph(power_graph(red_team)))
+    temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
+    temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
+    temp_chart_code.append(damage_distribution(blue_team))
+    temp_chart_code.append(damage_distribution(red_team))
+    test=power_df
+    comment_code=[]
+    if ml_features(blue_team,red_team)['over_atk'] >= 1 and ml_features(blue_team,red_team)['over_def'] >= 1 :
+        comment_code.append('Overkill')
+    elif ml_features(blue_team,red_team)['over_atk'] <= -1:
+        comment_code.append('Underkill')
+    else:
+        comment_code.append(' ')
+
+    context = {
+#        'champions': selected_champions,
+        'stats': stats,
+        'temp_chart_code': temp_chart_code,
+        "value": result_df,
+        "test":test
+    }
+    return render(request, 'mainapp/report.html', context)
 

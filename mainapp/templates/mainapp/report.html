@@ -103,8 +103,6 @@
 </head>
 <body>
     <div class="main-container">
-        <div class="teams-container">
-            <div class="container">
                 <table>
                     <tr>
                         <td><img src="/static/{{ champions.0 }}.png" style="width: 100%; height: 100%; border-radius: 8px;"></td>
@@ -121,23 +119,6 @@
                         <td class="td2">Win-rate : {{ stats.4.2.0 }}%<br>Pick : {{ stats.4.1.0 }} <br>Ban : {{ stats.4.0.0 }}</td>
                     </tr>
                 </table>
-                <div>
-                    {{ temp_chart_code.6|safe }}
-                </div>
-                <div>
-                    {{ temp_chart_code.8|safe }}
-                </div>
-                <div>
-                    {{ temp_chart_code.0|safe }}
-                </div>
-                <div>
-                    {{ temp_chart_code.1|safe }}
-                </div>
-                <div>
-                    {{ temp_chart_code.4|safe }}
-                </div>
-            </div>
-            <div class="container">
                 <table>
                     <tr>
                         <td style="border: 2px solid #FF6384;"><img src="/static/{{ champions.5 }}.png" style="width: 100%; height: 100%; border-radius: 8px;"></td>
@@ -155,26 +136,53 @@
                     </tr>
                 </table>
                 <div>
-                    {{ temp_chart_code.7|safe }}
+                    승부 예측
                 </div>
+
+                <div class="win-rate">
+                    Blue Team : {{value.0}} &nbsp;&nbsp;&nbsp; Red Team : {{value.1}}
+                </div>
+
+                    조합
                 <div>
-                    {{ temp_chart_code.9|safe }}
+                    {{ temp_chart_code.0|safe }}
                 </div>
                 <div>
                     {{ temp_chart_code.2|safe }}
                 </div>
+
+                    카운터
+                <div>
+                    {{ temp_chart_code.1|safe }}
+                </div>
                 <div>
                     {{ temp_chart_code.3|safe }}
+                </div>
+
+                    공방비율
+                <div>
+                    {{ temp_chart_code.6|safe }}
+                </div>
+                <div>
+                    {{ temp_chart_code.7|safe }}
+                </div>
+
+                    피해유형분포
+                <div>
+                    {{ temp_chart_code.8|safe }}
+                </div>
+                <div>
+                    {{ temp_chart_code.9|safe }}
+                </div>
+
+                    
+                <div>
+                    {{ temp_chart_code.4|safe }}
                 </div>
                 <div>
                     {{ temp_chart_code.5|safe }}
                 </div>
-            </div>
-        </div>
-        <div class="win-rate">
-            {{ temp_chart_code.5|safe }}
-            Blue Team : {{value.0}} &nbsp;&nbsp;&nbsp; Red Team : {{value.1}}
-        </div>
+
         <button type="button" class="submit-button" onclick="location.href='http://127.0.0.1:8000/mainapp/'">다시 선택하기</button>
 </body>
 </html>
