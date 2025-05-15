@@ -378,7 +378,7 @@ def duo_chart(blue_team):
         for j in range(0,len(temp_data[i])) :
             if temp_data[i][j] > 0:
                 if temp_data[4-i][4-j] > 0:
-                    if temp_data[i][j]+temp_data[j][i] > 10:
+                    if temp_data[i][j]+temp_data[j][i] >= 20:
                         synergy_list.append([blue_team[i],blue_team[j],temp_data[i][j]+temp_data[j][i]])
     seen = set()
     synergy = []
@@ -464,9 +464,8 @@ def count_chart(blue_team,red_team):
     synergy_list=[]
     for i in range(0,len(temp_data)):
         for j in range(0,len(temp_data[i])) :
-            if temp_data[i][j] > 0:
-                if temp_data[i][j]+temp_data[j][i] > 10:
-                    synergy_list.append([blue_team[i],red_team[j],temp_data[i][j]+temp_data[j][i]])
+            if temp_data[i][j] >= 15:
+                synergy_list.append([blue_team[i],red_team[j],temp_data[i][j]])
     fig = go.Figure(data=go.Heatmap(
         z=temp_df.values,
         x=temp_df.columns,
@@ -702,11 +701,20 @@ def damage_distribution(champion_list):
     total_AP_p = selected_df['AP_p'].sum()
     total_TD_p = selected_df['TD_p'].sum()
     champion_list[-1] = champion_list[-1].replace('_support', '')
+    # 40 <- 변경예정
+    if total_AD_p >= 40 and total_AP_p >= 40:
+        comment='Balanced'
+    elif total_AD_p >= 50 or total_AP_p <= 35 :
+        comment='AD'
+    elif total_AP_p >= 50 or total_AD_p <= 35 :
+        comment='AP'
+    else:
+        comment='Balanced'
     # 데이터 준비
     values = [total_AD_p, total_AP_p, total_TD_p]
     labels = ['AD', 'AP', 'True Damage']
     colors = ['#FF6F61', '#5DADE2', '#F4D03F']  # AD(빨강), AP(파랑), TD(노랑)
-
+    
     # 파이 차트 생성
     fig = go.Figure(data=[go.Pie(
         labels=labels,
@@ -731,7 +739,7 @@ def damage_distribution(champion_list):
             full_html=False,
             include_plotlyjs='cdn',
             div_id='THIS_IS_FIGID'+str(random.random())))
-    return chart_code
+    return [chart_code,comment]
 
 
 def ml_features(blue_team,red_team):
@@ -771,6 +779,28 @@ def ml_features(blue_team,red_team):
     test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
     features=test_df
     return features
+  
+def dmg_weight_chart_comment(blue_team,red_team):
+    comment_code=''
+    # 1 <- 변경예정
+    if ml_features(blue_team,red_team)['over_atk'] >= 1 :
+        comment_code='Over'
+    elif ml_features(blue_team,red_team)['over_atk'] <= -1:
+        comment_code='Lack'
+    else:
+        comment_code='Enough'
+    ml_temp_blue_df=dmg_weight(blue_team)
+    blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
+    blue_total_def = sum([item[2] for item in ml_temp_blue_df])
+    blue_atk_cnt=count_carry_lines(blue_temp_atk)
+    blue_def_cnt=count_tank_lines(blue_temp_def)
+    if blue_atk_cnt >= 4:
+        comment_code_2 = 'Balanced'
+    elif blue_atk_cnt >=3:
+        comment_code_2 = 'Skewed'
+    else :
+        comment_code_2 = 'Lopsided'
+    return [comment_code,comment_code_2]
 
 ml_df=[]
 for i in game_list:
@@ -887,8 +917,8 @@ def result(request):
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
-    temp_chart_code.append(damage_distribution(blue_team))
-    temp_chart_code.append(damage_distribution(red_team))
+    temp_chart_code.append(damage_distribution(blue_team)[0])
+    temp_chart_code.append(damage_distribution(red_team)[0])
     test=power_df
     print(blue_team)
     print(red_team)
@@ -932,8 +962,8 @@ def report(request):
     temp_chart_code.append(create_power_graph(power_graph(red_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
     temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
-    temp_chart_code.append(damage_distribution(blue_team))
-    temp_chart_code.append(damage_distribution(red_team))
+    temp_chart_code.append(damage_distribution(blue_team)[0])
+    temp_chart_code.append(damage_distribution(red_team)[0])
     test=power_df
     comment_code=[]
     if ml_features(blue_team,red_team)['over_atk'] >= 1 and ml_features(blue_team,red_team)['over_def'] >= 1 :
