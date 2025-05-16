@@ -784,14 +784,19 @@ def dmg_weight_chart_comment(blue_team,red_team):
     comment_code=''
     # 1 <- 변경예정
     if ml_features(blue_team,red_team)['over_atk'] >= 1 :
-        comment_code='Over'
+        comment_code='Abundant'
     elif ml_features(blue_team,red_team)['over_atk'] <= -1:
-        comment_code='Lack'
+        comment_code='Scant'
     else:
-        comment_code='Enough'
+        comment_code='Adequate'
     ml_temp_blue_df=dmg_weight(blue_team)
     blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
     blue_total_def = sum([item[2] for item in ml_temp_blue_df])
+    blue_temp_atk=[]
+    blue_temp_def=[]
+    for blue_i in ml_temp_blue_df:
+        blue_temp_atk.append(blue_i[1]/blue_total_atk)
+        blue_temp_def.append(blue_i[2]/blue_total_def)
     blue_atk_cnt=count_carry_lines(blue_temp_atk)
     blue_def_cnt=count_tank_lines(blue_temp_def)
     if blue_atk_cnt >= 4:
@@ -800,7 +805,13 @@ def dmg_weight_chart_comment(blue_team,red_team):
         comment_code_2 = 'Skewed'
     else :
         comment_code_2 = 'Lopsided'
-    return [comment_code,comment_code_2]
+    if blue_def_cnt >= 4:
+        comment_code_3 = 'Balanced'
+    elif blue_def_cnt >=3:
+        comment_code_3 = 'Skewed'
+    else :
+        comment_code_3 = 'Lopsided'
+    return [comment_code,comment_code_2,comment_code_3]
 
 ml_df=[]
 for i in game_list:
@@ -966,17 +977,22 @@ def report(request):
     temp_chart_code.append(damage_distribution(red_team)[0])
     test=power_df
     comment_code=[]
-    if ml_features(blue_team,red_team)['over_atk'] >= 1 and ml_features(blue_team,red_team)['over_def'] >= 1 :
-        comment_code.append('Overkill')
-    elif ml_features(blue_team,red_team)['over_atk'] <= -1:
-        comment_code.append('Underkill')
-    else:
-        comment_code.append(' ')
+    comment_code.append(duo_chart(blue_team)[1])
+    comment_code.append(count_chart(blue_team,red_team)[1])
+    comment_code.append(duo_chart(red_team)[1])
+    comment_code.append(count_chart(red_team,blue_team)[1])
+    comment_code.append('power_graph(blue_team)')
+    comment_code.append('power_graph(red_team)')
+    comment_code.append(dmg_weight_chart_comment(blue_team,red_team))
+    comment_code.append(dmg_weight_chart_comment(red_team,blue_team))
+    comment_code.append(damage_distribution(blue_team)[1])
+    comment_code.append(damage_distribution(red_team)[1])
 
     context = {
 #        'champions': selected_champions,
         'stats': stats,
         'temp_chart_code': temp_chart_code,
+        'comment_code': comment_code,
         "value": result_df,
         "test":test
     }
