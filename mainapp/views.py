@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import numpy as np
 import random
 import plotly.express as px
+from collections import defaultdict
 
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
@@ -224,11 +225,12 @@ for cham in champion_list:
     power_graph=[]
     for k in range(0,30):
         temp=[]
+        value=0
         for u in time_gold:
             try:
                 temp.append(u[k])
             except:
-                break
+                pass
         if len(temp) != 0:
             value=round(sum(temp)/len(temp),2)
         power_graph.append(value)
@@ -350,6 +352,40 @@ def process_teams(Blue_Team, Red_Team):
     features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
     return features
 
+def time_bucket(t):
+    if t<=10:
+        return 'early'
+    elif t<=20:
+        return 'middle'
+    else:
+        return 'late'
+        
+def gold(cham_list):
+    gold_result=[]
+    temp_2=[]
+    temp_3=[]
+    for i in cham_list:
+        i=i.lower()
+        if len(power_df[power_df['Champion']==i]['Gold_Data']) != 0:
+            temp_2.append(power_df[power_df['Champion']==i]['Gold_Data'].iloc[0])
+    for k in range(0,35):
+        temp=[]
+        value=0
+        for u in temp_2:
+            try:
+                temp.append(u[k])
+            except:
+                pass
+        if len(temp) != 0:
+            value=round(sum(temp)/len(temp),2)
+        temp_3.append([k,value])
+    temp_gold_result=pd.DataFrame(temp_3)
+    temp_gold_result.columns=['time','gold']
+    temp_gold_result['TimeRange']=temp_gold_result['time'].apply(time_bucket)
+    temp_gold_result = temp_gold_result[~((temp_gold_result['TimeRange'] == 'late') & (temp_gold_result['gold'] == 0))]
+    gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
+    return gold_result
+
 def duo_chart(blue_team):
     blue_duo=[]
     for i in blue_team:
@@ -382,11 +418,16 @@ def duo_chart(blue_team):
                         synergy_list.append([blue_team[i],blue_team[j],temp_data[i][j]+temp_data[j][i]])
     seen = set()
     synergy = []
+    synergy_dict = defaultdict(set)
+    seen = set()
     for champ1, champ2, value in synergy_list:
-        key = tuple(sorted([champ1, champ2]) + [round(value, 2)])
+        key = tuple(sorted([champ1, champ2]))
         if key not in seen:
             seen.add(key)
-            synergy.append([champ1, champ2, value])
+            synergy_dict[champ1].add(champ2)
+            synergy_dict[champ2].add(champ1)
+
+    synergy = [[champ, list(partners)] for champ, partners in synergy_dict.items() if partners]
 
     fig = go.Figure(data=go.Heatmap(
         z=temp_df.values,
@@ -462,10 +503,15 @@ def count_chart(blue_team,red_team):
     temp_df.index = blue_team
     temp_df.columns = red_team
     synergy_list=[]
-    for i in range(0,len(temp_data)):
-        for j in range(0,len(temp_data[i])) :
-            if temp_data[i][j] >= 15:
-                synergy_list.append([blue_team[i],red_team[j],temp_data[i][j]])
+    synergy_dict = defaultdict(set)
+    for i in range(len(temp_data)):
+        for j in range(len(temp_data[i])):
+            value = temp_data[i][j]
+            if value >= 15:
+                champ1 = blue_team[i]
+                champ2 = red_team[j]
+                synergy_dict[champ1].add(champ2)
+    synergy_list = [    [champ, list(partners)] for champ, partners in synergy_dict.items() if partners]
     fig = go.Figure(data=go.Heatmap(
         z=temp_df.values,
         x=temp_df.columns,
@@ -559,28 +605,24 @@ def create_dataframe(data_list):
 def create_power_graph(power_data):
     # DataFrame 생성
     power_df2 = create_dataframe(power_data)
-    # Plotly를 사용한 라인 차트 생성
 
     max_value = max(power_df2['Value'])
-    # Y축 최대값을 데이터 최대값과 1000 중 큰 값으로 설정
-    y_max = max(max_value, 1000)
-    fig = px.line(power_df2,
-                  x='Time',
-                  y='Value',
-                  color='Champion',
-                  title='Champion Power Over Time(30min)',
-                  labels={'Time': 'Time',
-                         'Value': 'Earn Gold',
-                         'Champion': 'Champion'},
-                  markers=True)
-    # 차트 레이아웃 커스터마이징
+    y_max = max(max_value, 4000)
+
+    # 누적 영역 차트로 변경
+    fig = px.area(
+        power_df2,
+        x='Time',
+        y='Value',
+        color='Champion',
+        title='Champion Power Over Time (Stacked)',
+        labels={'Time': 'Time', 'Value': 'Earn Gold', 'Champion': 'Champion'},
+    )
+
     fig.update_layout(
         plot_bgcolor='#1d1e33',
         paper_bgcolor='#0a0e21',
-        font=dict(
-                family='Arial',
-                color='white'         # 텍스트 색상
-            ),
+        font=dict(family='Arial', color='white'),
         legend=dict(
             yanchor="top",
             y=0.99,
@@ -589,13 +631,14 @@ def create_power_graph(power_data):
         ),
         hovermode='x unified'
     )
-    # 축 스타일 설정
+
     fig.update_xaxes(
         gridcolor='lightgrey',
         zeroline=True,
         zerolinewidth=1,
         zerolinecolor='lightgrey'
     )
+
     fig.update_yaxes(
         gridcolor='lightgrey',
         zeroline=True,
@@ -603,10 +646,12 @@ def create_power_graph(power_data):
         zerolinecolor='lightgrey',
         range=[0, y_max * 1.1]
     )
-    chart_code=(fig.to_html(
-            full_html=False,
-            include_plotlyjs='cdn',
-            div_id='THIS_IS_FIGID'+str(random.random())))
+
+    chart_code = fig.to_html(
+        full_html=False,
+        include_plotlyjs='cdn',
+        div_id='THIS_IS_FIGID'+str(random.random())
+    )
     return chart_code
 
 def dmg_weight(cham_list):
@@ -700,16 +745,15 @@ def damage_distribution(champion_list):
     total_AD_p = selected_df['AD_p'].sum()
     total_AP_p = selected_df['AP_p'].sum()
     total_TD_p = selected_df['TD_p'].sum()
+    all_sum=total_AD_p+total_AP_p+total_TD_p
     champion_list[-1] = champion_list[-1].replace('_support', '')
     # 40 <- 변경예정
-    if total_AD_p >= 40 and total_AP_p >= 40:
-        comment='Balanced'
-    elif total_AD_p >= 50 or total_AP_p <= 35 :
+    if total_AD_p/all_sum*100 >= 55 or total_AP_p/all_sum*100 <= 35 :
         comment='AD'
-    elif total_AP_p >= 50 or total_AD_p <= 35 :
+    elif total_AP_p/all_sum*100 >= 55 or total_AD_p/all_sum*100 <= 35 :
         comment='AP'
     else:
-        comment='Balanced'
+        comment='균형'
     # 데이터 준비
     values = [total_AD_p, total_AP_p, total_TD_p]
     labels = ['AD', 'AP', 'True Damage']
@@ -783,12 +827,18 @@ def ml_features(blue_team,red_team):
 def dmg_weight_chart_comment(blue_team,red_team):
     comment_code=''
     # 1 <- 변경예정
-    if ml_features(blue_team,red_team)['over_atk'] >= 1 :
-        comment_code='Abundant'
-    elif ml_features(blue_team,red_team)['over_atk'] <= -1:
-        comment_code='Scant'
+    if ml_features(blue_team,red_team)['over_atk'].iloc[0] >= 1 :
+        comment_code='충만'
+    elif ml_features(blue_team,red_team)['over_atk'].iloc[0] <= -1:
+        comment_code='부족'
     else:
-        comment_code='Adequate'
+        comment_code='적정'
+    if ml_features(blue_team,red_team)['over_def'].iloc[0] >= 1 :
+        comment_code_3='충만'
+    elif ml_features(blue_team,red_team)['over_def'].iloc[0] <= -1:
+        comment_code_3='부족'
+    else:
+        comment_code_3='적정'
     ml_temp_blue_df=dmg_weight(blue_team)
     blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
     blue_total_def = sum([item[2] for item in ml_temp_blue_df])
@@ -800,18 +850,18 @@ def dmg_weight_chart_comment(blue_team,red_team):
     blue_atk_cnt=count_carry_lines(blue_temp_atk)
     blue_def_cnt=count_tank_lines(blue_temp_def)
     if blue_atk_cnt >= 4:
-        comment_code_2 = 'Balanced'
+        comment_code_2 = '균형'
     elif blue_atk_cnt >=3:
-        comment_code_2 = 'Skewed'
+        comment_code_2 = '편향'
     else :
-        comment_code_2 = 'Lopsided'
+        comment_code_2 = '집중'
     if blue_def_cnt >= 4:
-        comment_code_3 = 'Balanced'
+        comment_code_4 = '균형'
     elif blue_def_cnt >=3:
-        comment_code_3 = 'Skewed'
+        comment_code_4 = '편향'
     else :
-        comment_code_3 = 'Lopsided'
-    return [comment_code,comment_code_2,comment_code_3]
+        comment_code_4 = '집중'
+    return [comment_code,comment_code_2,comment_code_3,comment_code_4]
 
 ml_df=[]
 for i in game_list:
@@ -944,23 +994,55 @@ def result(request):
 
 
 def report(request):
-#    if request.method == 'POST':
-#        selected_champions = request.POST.getlist('champion')
+    if request.method == 'POST':
+        selected_champions = request.POST.getlist('champion')
     stats = []
-#    for i in selected_champions:
-#        stats.append([df[df['Champion']==i.replace('%20',' ')]['Ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
+    for i in selected_champions:
+        stats.append([df[df['Champion']==i.replace('%20',' ')]['Ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
     temp_chart_code=[]
     count=0
     blue_team = []
     red_team = []
-#    for i in selected_champions:
-#        if count < 5:
-#            blue_team.append(i.replace('%20',' '))
-#        else:
-#            red_team.append(i.replace('%20',' '))
-#        count=count+1
-    blue_team = ['rumble', 'naafiri', 'ahri', 'kaisa', 'leona']
-    red_team = ['gwen', 'pantheon', 'azir', 'jhin', 'rell']
+    for i in selected_champions:
+        if count < 5:
+            blue_team.append(i.replace('%20',' '))
+        else:
+            red_team.append(i.replace('%20',' '))
+        count=count+1
+#    blue_team = ['rumble', 'naafiri', 'ahri', 'kaisa', 'leona']
+#    red_team = ['gwen', 'pantheon', 'azir', 'jhin', 'rell']
+    blue_gold_comment_code=[]
+    red_gold_comment_code=[]
+    gold_comment=pd.concat([gold(blue_team),gold(red_team)],axis=1)
+    gold_comment.columns=['Time','blue_gold','-','red_gold']
+    gold_comment['diff_gold']=gold_comment['blue_gold']-gold_comment['red_gold']
+    if gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0] >= 50 :
+        blue_gold_comment_code.append('우세')
+        red_gold_comment_code.append('열세')
+    elif gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0] <= 50:
+        blue_gold_comment_code.append('열세')
+        red_gold_comment_code.append('우세')
+    else:
+        blue_gold_comment_code.append('대등')
+        red_gold_comment_code.append('대등')
+    if gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0] >= 50 :
+        blue_gold_comment_code.append('우세')
+        red_gold_comment_code.append('열세')
+    elif gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0] <= 50:
+        blue_gold_comment_code.append('열세')
+        red_gold_comment_code.append('우세')
+    else:
+        blue_gold_comment_code.append('대등')
+        red_gold_comment_code.append('대등')
+    if gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0] >= 50 :
+        blue_gold_comment_code.append('우세')
+        red_gold_comment_code.append('열세')
+    elif gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0] <= 50:
+        blue_gold_comment_code.append('열세')
+        red_gold_comment_code.append('우세')
+    else:
+        blue_gold_comment_code.append('대등')
+        red_gold_comment_code.append('대등')
     pred = final_model.predict(ml_features(blue_team,red_team))
     pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
@@ -981,15 +1063,15 @@ def report(request):
     comment_code.append(count_chart(blue_team,red_team)[1])
     comment_code.append(duo_chart(red_team)[1])
     comment_code.append(count_chart(red_team,blue_team)[1])
-    comment_code.append('power_graph(blue_team)')
-    comment_code.append('power_graph(red_team)')
+    comment_code.append(blue_gold_comment_code)
+    comment_code.append(red_gold_comment_code)
     comment_code.append(dmg_weight_chart_comment(blue_team,red_team))
     comment_code.append(dmg_weight_chart_comment(red_team,blue_team))
     comment_code.append(damage_distribution(blue_team)[1])
     comment_code.append(damage_distribution(red_team)[1])
 
     context = {
-#        'champions': selected_champions,
+        'champions': selected_champions,
         'stats': stats,
         'temp_chart_code': temp_chart_code,
         'comment_code': comment_code,
@@ -997,4 +1079,3 @@ def report(request):
         "test":test
     }
     return render(request, 'mainapp/report.html', context)
-
