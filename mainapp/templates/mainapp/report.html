@@ -322,9 +322,36 @@
         color: #ff6b7a;
         border-left: 3px solid #e63946;
         }
+        .synergy-section {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        }
+        .synergy-card {
+            background-color: #1f1f2e;
+            padding: 12px 16px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .champion-name {
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        .partner-tag {
+            display: inline-block;
+            background-color: #444;
+            color: #fff;
+            padding: 4px 8px;
+            margin: 2px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
+
     <div class="main-container">
         <header class="page-header">
             <h1 class="page-title">LoL 밴픽 리포트</h1>
@@ -565,11 +592,20 @@
                 <div class="chart-container">
                     {{ temp_chart_code.0|safe }}
                 </div>
-                <div class="synergy-details">
-                    {% for i in comment_code.0 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
+                <div class="synergy-section">
+                    {% for champ0, partners0 in comment_code.0 %}
+                    <div class="synergy-card">
+                        <div class="champion-name">{{ champ0 }}</div>
+                        <div class="partner-list">
+                            {% for partner0 in partners0 %}
+                            <span class="partner-tag">{{ partner0 }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
+
+
             </div>
             
             <!-- Blue Team Counter Chart -->
@@ -578,9 +614,16 @@
                 <div class="chart-container">
                     {{ temp_chart_code.1|safe }}
                 </div>
-                <div class="counter-details">
-                    {% for i in comment_code.1 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
+                <div class="synergy-section">
+                    {% for champ1, partners1 in comment_code.1 %}
+                    <div class="synergy-card">
+                        <div class="champion-name">{{ champ1 }}</div>
+                        <div class="partner-list">
+                            {% for partner1 in partners1 %}
+                            <span class="partner-tag">{{ partner1 }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -591,7 +634,7 @@
                     {{ temp_chart_code.6|safe }}
                 </div>
                 <div class="synergy-item">
-                    공격 : {% if comment_code.6.0 == "충만" %}
+                    🗡️ : {% if comment_code.6.0 == "충만" %}
                     <div class="keyword-box green-box">
                     {% elif comment_code.6.0 == "적정" %}
                     <div class="keyword-box blue-box">
@@ -607,7 +650,7 @@
                     <div class="keyword-box red-box">
                     {% endif %}{{ comment_code.6.1 }}</div>
                     <br>
-                    방어 : {% if comment_code.6.2 == "충만" %}
+                    🛡️ : {% if comment_code.6.2 == "충만" %}
                     <div class="keyword-box green-box">
                     {% elif comment_code.6.2 == "적정" %}
                     <div class="keyword-box blue-box">
@@ -684,9 +727,16 @@
                 <div class="chart-container">
                     {{ temp_chart_code.2|safe }}
                 </div>
-                <div class="synergy-details">
-                    {% for i in comment_code.2 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
+                <div class="synergy-section">
+                    {% for champ2, partners2 in comment_code.2 %}
+                    <div class="synergy-card">
+                        <div class="champion-name">{{ champ2 }}</div>
+                        <div class="partner-list">
+                            {% for partner2 in partners2 %}
+                            <span class="partner-tag">{{ partner2 }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -697,9 +747,16 @@
                 <div class="chart-container">
                     {{ temp_chart_code.3|safe }}
                 </div>
-                <div class="counter-details">
-                    {% for i in comment_code.3 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
+                <div class="synergy-section">
+                    {% for champ3, partners3 in comment_code.3 %}
+                    <div class="synergy-card">
+                        <div class="champion-name">{{ champ3 }}</div>
+                        <div class="partner-list">
+                            {% for partner3 in partners3 %}
+                            <span class="partner-tag">{{ partner3 }}</span>
+                            {% endfor %}
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </div>
@@ -710,7 +767,7 @@
                     {{ temp_chart_code.7|safe }}
                 </div>
                 <div class="synergy-item">
-                    공격 : {% if comment_code.7.0 == "충만" %}
+                    🗡️ : {% if comment_code.7.0 == "충만" %}
                     <div class="keyword-box green-box">
                     {% elif comment_code.7.0 == "적정" %}
                     <div class="keyword-box blue-box">
@@ -726,7 +783,7 @@
                     <div class="keyword-box red-box">
                     {% endif %}{{ comment_code.7.1 }}</div>
                     <br>
-                    방어 : {% if comment_code.7.2 == "충만" %}
+                    🛡️ : {% if comment_code.7.2 == "충만" %}
                     <div class="keyword-box green-box">
                     {% elif comment_code.7.2 == "적정" %}
                     <div class="keyword-box blue-box">
@@ -795,12 +852,33 @@
                 </div>
             </div>
         </div>
-
         <button type="button" class="submit-button" onclick="location.href='http://127.0.0.1:8000/mainapp/'">다시 선택하기</button>
+        <button class="submit-button" id="copy-btn">HTML 복사하기</button>
+
     </div>
 
-    <footer>
-        <p>© 2025 LoL 밴픽 리포트 | All game data belongs to Riot Games</p>
-    </footer>
+
+<script>
+  const replacements = {{ replacements|safe }}; 
+  
+  document.getElementById('copy-btn').addEventListener('click', function () {
+
+    const copyArea = document.getElementById('copy-area');
+    const clone = copyArea.cloneNode(true);  
+
+    clone.querySelectorAll('.no-copy, button').forEach(el => el.remove());
+
+    let html = clone.innerHTML;
+    replacements.forEach(([a, b]) => {
+      const regex = new RegExp(a, 'g');
+      html = html.replace(regex, b);
+    });
+
+    navigator.clipboard.writeText(html)
+      .then(() => alert("복사 완료!"))
+      .catch(err => alert("복사 실패: " + err));
+  });
+</script>
+
 </body>
 </html>

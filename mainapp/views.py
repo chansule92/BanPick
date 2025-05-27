@@ -7,6 +7,7 @@ import numpy as np
 import random
 import plotly.express as px
 from collections import defaultdict
+import json
 
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
@@ -208,6 +209,20 @@ dmg_rate_df['deal_death_norm']=dmg_rate_df['deal_death']/avg_deal_death
 dmg_rate_df['deal_time_norm']=dmg_rate_df['deal_time']/avg_deal_time
 dmg_rate_df['deal_norm_total'] = dmg_rate_df['deal_death_norm'] + dmg_rate_df['deal_time_norm']
 dmg_rate_df['Champion']=dmg_rate_df['Champion'].str.lower()
+
+sql4="""
+SELECT REPLACE(concat('/static/',img),' ','%20') AS local
+     , url 
+  FROM mainapp_champion_index A
+       LEFT OUTER JOIN champ_url B
+    ON A.EN = SUBSTRING_INDEX(B.img,'.',1)
+"""
+
+def get_replacements():
+    with connection.cursor() as cursor:
+        cursor.execute(sql4)
+        results = cursor.fetchall()
+    return results
 
 
 cham_powergraph=[]
@@ -510,7 +525,6 @@ def count_chart(blue_team,red_team):
             if value >= 15:
                 champ1 = blue_team[i]
                 champ2 = red_team[j]
-                # 양방향 시너지 등록
                 synergy_dict[champ1].add(champ2)
     synergy_list = [    [champ, list(partners)] for champ, partners in synergy_dict.items() if partners]
     fig = go.Figure(data=go.Heatmap(
@@ -1071,12 +1085,16 @@ def report(request):
     comment_code.append(damage_distribution(blue_team)[1])
     comment_code.append(damage_distribution(red_team)[1])
 
+    replacements = get_replacements()
+    replacements_json = json.dumps(replacements)
+
     context = {
         'champions': selected_champions,
         'stats': stats,
         'temp_chart_code': temp_chart_code,
         'comment_code': comment_code,
         "value": result_df,
-        "test":test
+        "test":test,
+        'replacements': replacements_json
     }
     return render(request, 'mainapp/report.html', context)
