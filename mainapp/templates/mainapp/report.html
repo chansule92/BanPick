@@ -95,6 +95,7 @@
             overflow: hidden;
             box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
             transition: transform 0.2s ease-in-out;
+            align-items: center;
         }
         
         .blue-team .champion-card {
@@ -110,7 +111,7 @@
         }
         
         .champion-image {
-            width: 100%;
+            width: 80%;
             height: auto;
             display: block;
             border-radius: 8px 8px 0 0;
@@ -345,12 +346,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.0.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.0.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.0.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.0.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -364,12 +365,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.1.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.1.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.1.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.1.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -383,12 +384,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.2.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.2.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.2.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.2.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -402,12 +403,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.3.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.3.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.3.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.3.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -421,12 +422,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.4.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.4.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.4.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.4.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -450,12 +451,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.5.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.5.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.5.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.5.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -469,12 +470,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.6.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.6.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.6.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.6.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -488,12 +489,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.7.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.7.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.7.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.7.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -507,12 +508,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.8.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.8.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.8.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.8.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -526,12 +527,12 @@
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.9.1.0 }}</span>
-                                <span class="stat-label">픽률</span>
+                                <span class="stat-value">{{ stats.9.1.0|floatformat:"0" }}</span>
+                                <span class="stat-label">픽수</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.9.0.0 }}</span>
-                                <span class="stat-label">밴률</span>
+                                <span class="stat-value">{{ stats.9.0.0|floatformat:"0" }}</span>
+                                <span class="stat-label">밴수</span>
                             </div>
                         </div>
                     </div>
@@ -578,7 +579,7 @@
                     {{ temp_chart_code.1|safe }}
                 </div>
                 <div class="counter-details">
-                    {% for i in comment_code.2 %}
+                    {% for i in comment_code.1 %}
                     <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
                     {% endfor %}
                 </div>
@@ -644,6 +645,34 @@
                 <div class="chart-container">
                     {{ temp_chart_code.4|safe }}
                 </div>
+                <div class="synergy-details">
+                {% if comment_code.4.0 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.4.0 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.4.0|safe }} </div>
+                - 
+                {% if comment_code.4.1 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.4.1 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.4.1|safe }} </div>
+                - 
+                {% if comment_code.4.2 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.4.2 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.4.2|safe }}</div>
+                </div>
             </div>
         </div>
         
@@ -656,7 +685,7 @@
                     {{ temp_chart_code.2|safe }}
                 </div>
                 <div class="synergy-details">
-                    {% for i in comment_code.1 %}
+                    {% for i in comment_code.2 %}
                     <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
                     {% endfor %}
                 </div>
@@ -735,6 +764,34 @@
             <div class="analysis-card">
                 <div class="chart-container">
                     {{ temp_chart_code.5|safe }}
+                </div>
+                <div class="synergy-details">
+                {% if comment_code.5.0 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.5.0 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.5.0|safe }} </div>
+                - 
+                {% if comment_code.5.1 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.5.1 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.5.1|safe }} </div>
+                - 
+                {% if comment_code.5.2 == "우세" %}
+                <div class="keyword-box green-box">
+                {% elif comment_code.5.2 == "대등" %}
+                <div class="keyword-box blue-box">
+                {% else %}
+                <div class="keyword-box red-box">
+                {% endif %}
+                {{ comment_code.5.2|safe }}</div>
                 </div>
             </div>
         </div>

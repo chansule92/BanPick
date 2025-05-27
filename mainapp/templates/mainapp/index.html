@@ -209,7 +209,7 @@
                 </td>
             </tr>
         </table>
-        <form id="championForm" action="{% url 'result' %}" method="post" onsubmit="return submitForm()">
+        <form id="championForm" action="{% url 'report' %}" method="post" onsubmit="return submitForm()">
             {% csrf_token %}
             {% for i in pick %}
                 <!--<input type="hidden" id="championInput{{ i }}" name="champion{{ i }}" value="{% if blue_team and i < 5 %}{{ blue_team.i }}{% elif red_team and i >= 5 %}{{ red_team.i|add:"-5" }}{% endif %}">-->
