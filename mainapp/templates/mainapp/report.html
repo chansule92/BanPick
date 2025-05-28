@@ -360,11 +360,11 @@
 <body>
 
     <div class="main-container">
-        <div id="copy-target">
+        
         <header class="page-header">
             <h1 class="page-title">LoL 밴픽 리포트</h1>
         </header>
-
+        <div id="copy-target">
         <!-- Blue Team Section -->
         <section class="teams-section blue-team">
             <div class="team-header">
@@ -613,7 +613,6 @@
                     {% endfor %}
                 </div>
             </div>
-        </section>
 
             
             <!-- Blue Team Counter Chart -->
@@ -643,36 +642,36 @@
                 </div>
                 <div class="synergy-item">
                     🗡️ : {% if comment_code.6.0 == "충만" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.6.0 }}</div>
                     {% elif comment_code.6.0 == "적정" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.6.0 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.6.0 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.6.0 }}</div>
+                    {% endif %}
                     &
                     {% if comment_code.6.1 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.6.1 }}</div>
                     {% elif comment_code.6.1 == "편향" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.6.1 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.6.1 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.6.1 }}</div>
+                    {% endif %}
                     <br>
                     🛡️ : {% if comment_code.6.2 == "충만" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.6.2 }}</div>
                     {% elif comment_code.6.2 == "적정" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.6.2 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.6.2 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.6.2 }}</div>
+                    {% endif %}
                     &
                     {% if comment_code.6.3 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.6.3 }}</div>
                     {% elif comment_code.6.3 == "편향" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.6.3 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.6.3 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.6.3 }}</div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -683,14 +682,12 @@
                 </div>
                 <div class="synergy-item">
                     {% if comment_code.8 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.8 }}</div>
                     {% elif comment_code.8 == "AD" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.8 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.8 }}
-                    </div>
-                </div>
+                    <div class="keyword-box red-box">{{ comment_code.8 }}</div>
+                    {% endif %}
                 </div>
             </div>
             
@@ -701,31 +698,31 @@
                 </div>
                 <div class="synergy-item">
                 {% if comment_code.4.0 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.4.0|safe }} </div>
                 {% elif comment_code.4.0 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.4.0|safe }} </div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.4.0|safe }} </div>
                 {% endif %}
-                {{ comment_code.4.0|safe }} </div>
+                
                 - 
                 {% if comment_code.4.1 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.4.1|safe }} </div>
                 {% elif comment_code.4.1 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.4.1|safe }} </div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.4.1|safe }} </div>
                 {% endif %}
-                {{ comment_code.4.1|safe }} </div>
+                
                 - 
                 {% if comment_code.4.2 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.4.2|safe }}</div>
                 {% elif comment_code.4.2 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.4.2|safe }}</div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.4.2|safe }}</div>
                 {% endif %}
-                {{ comment_code.4.2|safe }}</div>
+                
                 </div>
             </div>
         </div>
@@ -779,36 +776,36 @@
                 </div>
                 <div class="synergy-item">
                     🗡️ : {% if comment_code.7.0 == "충만" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.7.0 }}</div>
                     {% elif comment_code.7.0 == "적정" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.7.0 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.7.0 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.7.0 }}</div>
+                    {% endif %}
                     &
                     {% if comment_code.7.1 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.7.1 }}</div>
                     {% elif comment_code.7.1 == "편향" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.7.1 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.7.1 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.7.1 }}</div>
+                    {% endif %}
                     <br>
                     🛡️ : {% if comment_code.7.2 == "충만" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.7.2 }}</div>
                     {% elif comment_code.7.2 == "적정" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.7.2 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.7.2 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.7.2 }}</div>
+                    {% endif %}
                     &
                     {% if comment_code.7.3 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.7.3 }}</div>
                     {% elif comment_code.7.3 == "편향" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.7.3 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.7.3 }}</div>
+                    <div class="keyword-box red-box">{{ comment_code.7.3 }}</div>
+                    {% endif %}
                 </div>
                 
             </div>
@@ -820,14 +817,12 @@
                 </div>
                 <div class="synergy-item">
                     {% if comment_code.9 == "균형" %}
-                    <div class="keyword-box green-box">
+                    <div class="keyword-box green-box">{{ comment_code.9 }}</div>
                     {% elif comment_code.9 == "AD" %}
-                    <div class="keyword-box blue-box">
+                    <div class="keyword-box blue-box">{{ comment_code.9 }}</div>
                     {% else %}
-                    <div class="keyword-box red-box">
-                    {% endif %}{{ comment_code.9 }}
-                    </div>
-                </div>
+                    <div class="keyword-box red-box">{{ comment_code.9 }}</div>
+                    {% endif %}
                 </div>
             </div>
                 
@@ -838,31 +833,29 @@
                 </div>
                 <div class="synergy-item">
                 {% if comment_code.5.0 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.5.0|safe }} </div>
                 {% elif comment_code.5.0 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.5.0|safe }} </div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.5.0|safe }} </div>
                 {% endif %}
-                {{ comment_code.5.0|safe }} </div>
                 - 
                 {% if comment_code.5.1 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.5.1|safe }} </div>
                 {% elif comment_code.5.1 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.5.1|safe }} </div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.5.1|safe }} </div>
                 {% endif %}
-                {{ comment_code.5.1|safe }} </div>
                 - 
                 {% if comment_code.5.2 == "우세" %}
-                <div class="keyword-box green-box">
+                <div class="keyword-box green-box">{{ comment_code.5.2|safe }}</div>
                 {% elif comment_code.5.2 == "대등" %}
-                <div class="keyword-box blue-box">
+                <div class="keyword-box blue-box">{{ comment_code.5.2|safe }}</div>
                 {% else %}
-                <div class="keyword-box red-box">
+                <div class="keyword-box red-box">{{ comment_code.5.2|safe }}</div>
                 {% endif %}
-                {{ comment_code.5.2|safe }}</div>
+                
                 </div>
             </div>
         </div>
