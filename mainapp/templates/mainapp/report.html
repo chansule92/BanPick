@@ -136,7 +136,7 @@
         }
         
         .stat-value {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
         }
         
@@ -248,6 +248,13 @@
             min-height: 300px;
             max-width: 800px;
         }
+
+        .gold-chart-container {
+            margin: 20px auto;
+            width: 100%;
+            min-height: 450px;
+            max-width: 800px;
+        }
         
         .submit-button {
             display: block;
@@ -321,7 +328,6 @@
         background-color: rgba(230, 57, 70, 0.15);
         color: #ff6b7a;
         border-left: 3px solid #e63946;
-<<<<<<< HEAD
         }
         .synergy-section {
         display: flex;
@@ -333,8 +339,6 @@
             padding: 12px 16px;
             border-radius: 10px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.3);
-=======
->>>>>>> 4f85adcaa31502500bbb74b2399677366bedc045
         }
         .champion-name {
             font-weight: bold;
@@ -356,6 +360,7 @@
 <body>
 
     <div class="main-container">
+        <div id="copy-target">
         <header class="page-header">
             <h1 class="page-title">LoL 밴픽 리포트</h1>
         </header>
@@ -372,7 +377,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.0.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.0.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -391,7 +396,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.1.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.1.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -410,7 +415,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.2.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.2.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -429,7 +434,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.3.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.3.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -448,7 +453,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.4.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.4.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -477,7 +482,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.5.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.5.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -496,7 +501,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.6.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.6.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -515,7 +520,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.7.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.7.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -534,7 +539,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.8.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.8.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -553,7 +558,7 @@
                     <div class="champion-stats">
                         <div class="stats-grid">
                             <div class="stat-item">
-                                <span class="stat-value">{{ stats.9.2.0 }}%</span>
+                                <span class="stat-value">{{ stats.9.2.0|floatformat:"1" }}%</span>
                                 <span class="stat-label">승률</span>
                             </div>
                             <div class="stat-item">
@@ -577,7 +582,6 @@
                 <div class="team-prediction blue-prediction">
                     <span>Blue Team</span>
                     <span class="prediction-value">{{value.0}}</span>
-<<<<<<< HEAD
                 </div>
                 <div class="vs-badge">VS</div>
                 <div class="team-prediction red-prediction">
@@ -607,36 +611,10 @@
                         </div>
                     </div>
                     {% endfor %}
-=======
-                </div>
-                <div class="vs-badge">VS</div>
-                <div class="team-prediction red-prediction">
-                    <span>Red Team</span>
-                    <span class="prediction-value">{{value.1}}</span>
->>>>>>> 4f85adcaa31502500bbb74b2399677366bedc045
                 </div>
             </div>
         </section>
 
-<<<<<<< HEAD
-
-=======
-        <!-- Team Analysis Sections -->
-        <h3 class="section-title">Blue Team 분석</h3>
-        <div class="analysis-section">
-            <!-- Blue Team Synergy Chart -->
-            <div class="analysis-card">
-                <h4 class="section-title">Blue Team 시너지</h4>
-                <div class="chart-container">
-                    {{ temp_chart_code.0|safe }}
-                </div>
-                <div class="synergy-details">
-                    {% for i in comment_code.0 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
-                    {% endfor %}
-                </div>
->>>>>>> 4f85adcaa31502500bbb74b2399677366bedc045
-            </div>
             
             <!-- Blue Team Counter Chart -->
             <div class="analysis-card">
@@ -644,7 +622,6 @@
                 <div class="chart-container">
                     {{ temp_chart_code.1|safe }}
                 </div>
-<<<<<<< HEAD
                 <div class="synergy-section">
                     {% for champ1, partners1 in comment_code.1 %}
                     <div class="synergy-card">
@@ -655,11 +632,6 @@
                             {% endfor %}
                         </div>
                     </div>
-=======
-                <div class="counter-details">
-                    {% for i in comment_code.1 %}
-                    <div class="synergy-item">{{ i.0 }} - {{i.1}}</div>
->>>>>>> 4f85adcaa31502500bbb74b2399677366bedc045
                     {% endfor %}
                 </div>
             </div>
@@ -718,13 +690,15 @@
                     <div class="keyword-box red-box">
                     {% endif %}{{ comment_code.8 }}
                 </div>
+                </div>
             </div>
             
             <div class="analysis-card">
-                <div class="chart-container">
+                <h4 class="section-title">Blue Team 골드획득 추이</h4>
+                <div class="gold-chart-container">
                     {{ temp_chart_code.4|safe }}
                 </div>
-                <div class="synergy-details">
+                <div class="synergy-item">
                 {% if comment_code.4.0 == "우세" %}
                 <div class="keyword-box green-box">
                 {% elif comment_code.4.0 == "대등" %}
@@ -852,13 +826,15 @@
                     <div class="keyword-box red-box">
                     {% endif %}{{ comment_code.9 }}
                 </div>
+                </div>
             </div>
                 
             <div class="analysis-card">
-                <div class="chart-container">
+                <h4 class="section-title">Red Team 골드획득 추이</h4>
+                <div class="gold-chart-container">
                     {{ temp_chart_code.5|safe }}
                 </div>
-                <div class="synergy-details">
+                <div class="synergy-item">
                 {% if comment_code.5.0 == "우세" %}
                 <div class="keyword-box green-box">
                 {% elif comment_code.5.0 == "대등" %}
@@ -888,33 +864,62 @@
                 </div>
             </div>
         </div>
+        </div>
         <button type="button" class="submit-button" onclick="location.href='http://127.0.0.1:8000/mainapp/'">다시 선택하기</button>
         <button class="submit-button" id="copy-btn">HTML 복사하기</button>
+        <button class="submit-button" onclick="saveAsImage()">이미지로 저장</button>
 
     </div>
 
-
 <script>
-  const replacements = {{ replacements|safe }}; 
-  
+  const replacements = {{ replacements|safe }}; // [["A", "A1"], ["B", "B1"], ...]
+
   document.getElementById('copy-btn').addEventListener('click', function () {
+    // ✅ 1. 복사할 영역을 클론
+    const original = document.getElementById('copy-target');
+    const clone = original.cloneNode(true); // true → 자식 포함 깊은 복사
 
-    const copyArea = document.getElementById('copy-area');
-    const clone = copyArea.cloneNode(true);  
-
+    // ✅ 2. 버튼과 .no-copy 클래스를 가진 요소 제거
     clone.querySelectorAll('.no-copy, button').forEach(el => el.remove());
 
+    // ✅ 3. 치환
     let html = clone.innerHTML;
-    replacements.forEach(([a, b]) => {
-      const regex = new RegExp(a, 'g');
-      html = html.replace(regex, b);
+    replacements.forEach(([source, target]) => {
+      const regex = new RegExp(source, 'g');
+      html = html.replace(regex, target);
     });
 
+    // ✅ 4. 클립보드 복사
     navigator.clipboard.writeText(html)
       .then(() => alert("복사 완료!"))
       .catch(err => alert("복사 실패: " + err));
   });
 </script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script>
+  function saveAsImage() {
+    const element = document.getElementById('copy-target');
+
+    html2canvas(element, {
+      scale: 2,              // 해상도 개선
+      useCORS: true          // 외부 이미지 문제 방지
+    }).then(canvas => {
+      // 이미지 데이터 생성
+      const image = canvas.toDataURL('image/png');
+
+      // 다운로드 링크 생성
+      const link = document.createElement('a');
+      link.href = image;
+      link.download = 'captured-content.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    });
+  }
+</script>
+
+
 
 </body>
 </html>
