@@ -428,7 +428,7 @@ def duo_chart(blue_team):
     for i in range(0,len(temp_data)):
         for j in range(0,len(temp_data[i])) :
             if temp_data[i][j] > 0:
-                if temp_data[4-i][4-j] > 0:
+                if temp_data[j][i] > 0:
                     if temp_data[i][j]+temp_data[j][i] >= 20:
                         synergy_list.append([blue_team[i],blue_team[j],temp_data[i][j]+temp_data[j][i]])
     seen = set()
@@ -1031,28 +1031,28 @@ def report(request):
     gold_comment=pd.concat([gold(blue_team),gold(red_team)],axis=1)
     gold_comment.columns=['Time','blue_gold','-','red_gold']
     gold_comment['diff_gold']=gold_comment['blue_gold']-gold_comment['red_gold']
-    if gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0] >= 50 :
+    if float(gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0]) >= 10 :
         blue_gold_comment_code.append('우세')
         red_gold_comment_code.append('열세')
-    elif gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0] <= 50:
+    elif float(gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0]) <= -10:
         blue_gold_comment_code.append('열세')
         red_gold_comment_code.append('우세')
     else:
         blue_gold_comment_code.append('대등')
         red_gold_comment_code.append('대등')
-    if gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0] >= 50 :
+    if float(gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0]) >= 10 :
         blue_gold_comment_code.append('우세')
         red_gold_comment_code.append('열세')
-    elif gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0] <= 50:
+    elif float(gold_comment[gold_comment['Time']=='middle']['diff_gold'].iloc[0]) <= -10:
         blue_gold_comment_code.append('열세')
         red_gold_comment_code.append('우세')
     else:
         blue_gold_comment_code.append('대등')
         red_gold_comment_code.append('대등')
-    if gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0] >= 50 :
+    if float(gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0]) >= 20 :
         blue_gold_comment_code.append('우세')
         red_gold_comment_code.append('열세')
-    elif gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0] <= 50:
+    elif float(gold_comment[gold_comment['Time']=='late']['diff_gold'].iloc[0]) <= -20:
         blue_gold_comment_code.append('열세')
         red_gold_comment_code.append('우세')
     else:

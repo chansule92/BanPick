@@ -354,6 +354,71 @@
             border-radius: 6px;
             font-size: 14px;
         }
+        .data-badge {
+            display: inline-flex;
+            align-items: center;
+            background: linear-gradient(135deg, rgba(46, 204, 113, 0.2), rgba(58, 80, 107, 0.3));
+            border: 1px solid rgba(46, 204, 113, 0.4);
+            border-radius: 25px;
+            padding: 8px 20px;
+            margin-top: 10px;
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        .badge-icon {
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        .badge-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--success-color);
+            letter-spacing: 0.5px;
+        }
+
+        .disclaimer {
+            background: linear-gradient(135deg, rgba(243, 156, 18, 0.15), rgba(230, 57, 70, 0.1));
+            border: 2px solid rgba(243, 156, 18, 0.5);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #f39c12;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+            animation: warning-pulse 3s ease-in-out infinite;
+        }
+
+        .disclaimer-icon {
+            font-size: 20px;
+            animation: shake 2s ease-in-out infinite;
+        }
+
+        @keyframes warning-pulse {
+            0%, 100% { 
+                box-shadow: 0 4px 8px rgba(243, 156, 18, 0.2);
+                border-color: rgba(243, 156, 18, 0.5);
+            }
+            50% { 
+                box-shadow: 0 6px 12px rgba(243, 156, 18, 0.4);
+                border-color: rgba(243, 156, 18, 0.7);
+            }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg); }
+            75% { transform: rotate(5deg); }
+        }
+        #copy-target {
+        background-color: #0a122a; /* 예: 밝은 회색 배경 */
+        }
+
+
 
     </style>
 </head>
@@ -365,6 +430,10 @@
             <h1 class="page-title">LoL 밴픽 리포트</h1>
         </header>
         <div id="copy-target">
+        <div class="data-badge">
+            <span class="badge-icon">📊</span>
+            <span class="badge-text">2025 시즌 LCK, LPL, LEC 데이터 기반</span>
+        </div>
         <!-- Blue Team Section -->
         <section class="teams-section blue-team">
             <div class="team-header">
@@ -589,6 +658,11 @@
                     <span class="prediction-value">{{value.1}}</span>
                 </div>
             </div>
+            <div class="disclaimer">
+                <span class="disclaimer-icon">⚠️</span>
+                <span><strong>주의!</strong> 본 예측은 밴픽 데이터 기반 분석이며, 실제 인게임 상황에 따라 결과가 크게 달라질 수 있습니다.</span>
+            </div>
+            
         </section>
 
         <!-- Team Analysis Sections -->
@@ -897,6 +971,7 @@
     const element = document.getElementById('copy-target');
 
     html2canvas(element, {
+      backgroundColor: null,
       scale: 2,              // 해상도 개선
       useCORS: true          // 외부 이미지 문제 방지
     }).then(canvas => {
