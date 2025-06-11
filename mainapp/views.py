@@ -895,6 +895,7 @@ for i in game_list:
 features=ml_df[['comb_score','over_atk','over_def','DT_comb','atk_cnt','def_cnt']]
 features_result=ml_df[['game_result']]
 import xgboost as xgb
+from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 X= features
@@ -902,8 +903,10 @@ y= features_result
 params = {
     'objective': 'binary:logistic',  # 이진 분류
     'eval_metric': 'logloss',        # 평가 지표
-    'max_depth': 4,
-    'eta': 0.1,
+    'max_depth': 3,
+    'eta': 0.05,
+    'gamma': 1,
+    'min_child_weight':3,
     'subsample': 0.8,
     'colsample_bytree': 0.8,
     'seed': 42,
@@ -922,13 +925,14 @@ for train_idx, val_idx in kf.split(X):
     X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
     y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
     
-    model = xgb.XGBClassifier(n_estimators=100)
-    model.fit(X_train, y_train,
+    model = xgb.XGBClassifier(n_estimators=300)
+    calibrated_model = CalibratedClassifierCV(model, method='isotonic', cv=5)
+    calibrated_model.fit(X_train, y_train,
               eval_set=[(X_val, y_val)],
               verbose=False)
     
-    y_pred = model.predict(X_val)
-    y_pred_prob = model.predict_proba(X_val)[:, 1]
+    y_pred = calibrated_model.predict(X_val)
+    y_pred_prob = calibrated_model.predict_proba(X_val)[:, 1]
     
     acc = accuracy_score(y_val, y_pred)
     auc = roc_auc_score(y_val, y_pred_prob)
