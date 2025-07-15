@@ -401,6 +401,26 @@ def gold(cham_list):
     gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
     return gold_result
 
+edu_ml=[]
+for i in game_list:
+    sample_ml=[]
+    sample=''
+    blue_gold=gold(result[i]['BLUE'][0])
+    red_gold=gold(result[i]['RED'][0])
+    sample=pd.concat([blue_gold,red_gold],axis=1)
+    sample.columns=['Time','blue_gold','-','red_gold']
+    sample['diff_gold']=sample['blue_gold']-sample['red_gold']
+#    sample_ml.append(round(sample[sample['Time']=='early']['diff_gold'].iloc[0],2))
+    sample_ml.append(round(sample[sample['Time']=='middle']['diff_gold'].iloc[0],2))
+    try:
+        sample_ml.append(round(sample[sample['Time']=='late']['diff_gold'].iloc[0],2))
+    except:
+        sample_ml.append(0)
+    edu_ml.append(sample_ml)
+gold_ml_df=pd.DataFrame(edu_ml)
+gold_ml_df.columns = ['middle_gold','late_gold']
+gold_ml_df
+
 def duo_chart(blue_team):
     blue_duo=[]
     for i in blue_team:
@@ -833,9 +853,9 @@ def ml_features(blue_team,red_team):
     ml_df = ml_df.reset_index(drop=True)
     test_df['over_atk']=ml_df['blue_total_atk']-ml_df['red_total_def']
     test_df['over_def']=ml_df['blue_total_def']-ml_df['red_total_atk']
-    test_df['DT_comb']=(ml_df['blue_total_atk']/ml_df['blue_total_def']) - (ml_df['red_total_atk']/ml_df['red_total_def'])
     test_df['atk_cnt']=ml_df['blue_atk_cnt']-ml_df['red_atk_cnt']
     test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
+    test_df['gold']=gold_ml_df['middle_gold'] * gold_ml_df['late_gold']
     features=test_df
     return features
   
@@ -892,7 +912,7 @@ for i in game_list:
         ml_df=ml_temp_df3
     else:
         ml_df=pd.concat([ml_df,ml_temp_df3],axis=0)
-features=ml_df[['comb_score','over_atk','over_def','DT_comb','atk_cnt','def_cnt']]
+features=ml_df[['comb_score','over_atk','over_def','atk_cnt','def_cnt','gold']]
 features_result=ml_df[['game_result']]
 import xgboost as xgb
 from sklearn.calibration import CalibratedClassifierCV
