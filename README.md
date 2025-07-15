@@ -36,11 +36,9 @@ Dep. Variable:            game_result   R-squared (uncentered):                 
 Model:                            OLS   Adj. R-squared (uncentered):              0.651
 Method:                 Least Squares   F-statistic:                              373.4
 Date:                Mon, 14 Jul 2025   Prob (F-statistic):                   1.08e-269
-Time:                        23:19:44   Log-Likelihood:                         -706.94
 No. Observations:                1199   AIC:                                      1426.
 Df Residuals:                    1193   BIC:                                      1456.
 Df Model:                           6                                                  
-Covariance Type:            nonrobust                                                  
 ================================================================================
                    coef    std err          t      P>|t|      [0.025      0.975]
 --------------------------------------------------------------------------------
@@ -51,11 +49,7 @@ over_atk_cnt     0.2659      0.016     16.259      0.000       0.234       0.298
 over_def_cnt     0.0918      0.008     11.957      0.000       0.077       0.107
 gold             0.0002   2.98e-05      6.936      0.000       0.000       0.000
 ==============================================================================
-Omnibus:                       46.226   Durbin-Watson:                   1.705
-Prob(Omnibus):                  0.000   Jarque-Bera (JB):               51.540
-Skew:                          -0.465   Prob(JB):                     6.43e-12
-Kurtosis:                       3.408   Cond. No.                     1.07e+03
-==============================================================================
+
 
 🔍 해석 요약
 
