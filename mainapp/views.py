@@ -11,7 +11,7 @@ import json
 
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
-  FROM a_game
+  FROM banpick.a_game
  WHERE Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')"""
 
 game_list_df = pd.read_sql(game_list_query, connection)
@@ -74,15 +74,15 @@ SELECT M1.Champion
                                 , SUM(CASE WHEN BP_DIV = 'Pick' THEN 1 ELSE 0 END) AS Pick
                              FROM ( SELECT 'Ban' AS BP_DIV
                                           , Ban AS Champion
-                                       FROM a_game_ban A
-                                            INNER JOIN a_game B
+                                       FROM banpick.a_game_ban A
+                                            INNER JOIN banpick.a_game B
                                          ON A.Game_ID = B.Game_ID
                                       WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
                                       UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
-                                       FROM a_game_ban A
-                                            INNER JOIN a_game B
+                                       FROM banpick.a_game_ban A
+                                            INNER JOIN banpick.a_game B
                                          ON A.Game_ID = B.Game_ID
                                       WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
                                   ) A
@@ -98,7 +98,7 @@ SELECT M1.Champion
                                          , A.Champion
                                          , A.Team_Div
                                          , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
-                                      FROM a_game_stat A
+                                      FROM banpick.a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
@@ -108,7 +108,7 @@ SELECT M1.Champion
                                          , A.Champion
                                          , A.Team_Div
                                          , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
-                                      FROM a_game_stat A
+                                      FROM banpick.a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
@@ -124,7 +124,7 @@ SELECT M1.Champion
                          ( SELECT A.Champion
                                 , sum(CASE WHEN A.Team_Div = 'Blue' AND B.Blue_Result = 'Win' THEN 1
                                            WHEN A.Team_Div = 'Red' AND B.Red_result = 'Win' THEN 1 ELSE 0 END) AS win_cnt
-                             FROM a_game_stat A
+                             FROM banpick.a_game_stat A
                                   INNER JOIN a_game B
                                ON A.Game_ID = B.Game_ID
                             WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
@@ -148,8 +148,8 @@ df['con_champ'] = df['con_champ'].str.lower()
 query2="""SELECT B.Champion
      , A.Gold_Data
      , A.CS_Data
-  FROM a_game_timeline A
-       INNER JOIN a_game_stat B
+  FROM banpick.a_game_timeline A
+       INNER JOIN banpick.a_game_stat B
     ON A.game_ID = B.Game_ID
    AND A.Team_Div = B.Team_Div
    AND A.ROLE = B.Role
@@ -176,7 +176,7 @@ SELECT F.Champion
               , avg(ROUND(CASE WHEN A.ROLE = 'JUNGLE' THEN A.`Total damage taken` * 0.7 ELSE A.`Total damage taken` END / ROUND((LEFT(B.Game_Time,2)*60 + RIGHT(B.Game_Time,2)) / 60,2))) AS tank_time
               , SUM(A.`Total damage to Champion`) / (SUM(A.Deaths) + count(A.Champion))  AS deal_death
               , round(avg(A.DPM),2) AS deal_time
-           FROM a_game_stat A
+           FROM banpick.a_game_stat A
                 INNER JOIN a_game B
              ON A.Game_ID = B.Game_ID 
           WHERE B.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')
@@ -190,9 +190,9 @@ SELECT A.Game_ID
      , B.Role
      , A.Blue_Result 
      , A.Red_Result 
-  FROM a_game A
+  FROM banpick.a_game A
        INNER JOIN 
-       a_game_stat B
+       banpick.a_game_stat B
     ON A.Game_ID = B.Game_ID 
  WHERE A.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')
 """
