@@ -28,10 +28,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
+#ALLOWED_HOSTS = [
+#    '127.0.0.1',
+#    'localhost',
+#    'ChocoPi.pythonanywhere.com'
+#]
 ALLOWED_HOSTS = [
-    '127.0.0.1',
-    'localhost',
-    'ChocoPi.pythonanywhere.com'
+    '*'
 ]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
 if RENDER_EXTERNAL_HOSTNAME:
