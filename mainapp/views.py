@@ -12,12 +12,12 @@ import json
 #conn = MySQLdb.connect(host='ChocoPi.mysql.pythonanywhere-services.com', user='ChocoPi', password='glemfk12@', database='ChocoPi$loldb')
 game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
   FROM banpick.a_game
- WHERE Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')"""
+ WHERE Ver like 'v15%'"""
 
 game_list_df = pd.read_sql(game_list_query, connection)
 
 
-game_list=game_list_df['Game_ID'].to_list()
+game_list=game_list_df['game_id'].to_list()
 Team_div = ['BLUE','RED']
 Position_div = ['TOP','JUNGLE','MID','ADC','SUPPORT']
 result={}
@@ -26,13 +26,13 @@ for i in game_list:
     for j in Team_div:
         temp_list=[]
         if j =='BLUE':
-            game_result=game_list_df[game_list_df['Game_ID']==i]['Blue_Result'].values[0]
+            game_result=game_list_df[game_list_df['game_id']==i]['blue_result'].values[0]
         else :
-            game_result=game_list_df[game_list_df['Game_ID']==i]['Red_Result'].values[0]
+            game_result=game_list_df[game_list_df['game_id']==i]['red_result'].values[0]
         for k in Position_div:
             champ_query="""SELECT Champion FROM a_game_stat where Game_ID = '{}' and Team_Div = '{}' and Role = '{}';""".format(i,j,k)
             champ_df=pd.read_sql(champ_query, connection)
-            temp_list.append((champ_df['Champion'].values)[0])
+            temp_list.append((champ_df['champion'].values)[0])
             team_id[j]=[temp_list,game_result]
             result[i]=team_id
 query = """
@@ -77,14 +77,14 @@ SELECT M1.Champion
                                        FROM banpick.a_game_ban A
                                             INNER JOIN banpick.a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
+                                      WHERE B.Ver like 'v15%'
                                       UNION ALL
                                      SELECT 'Pick' AS BP_DIV
                                           , Pick AS Champion
                                        FROM banpick.a_game_ban A
                                             INNER JOIN banpick.a_game B
                                          ON A.Game_ID = B.Game_ID
-                                      WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
+                                      WHERE B.Ver like 'v15%'
                                   ) A
                             GROUP BY Champion
                          ) T1
@@ -101,7 +101,7 @@ SELECT M1.Champion
                                       FROM banpick.a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
+                                     WHERE B.Ver like 'v15%'
                                   ) A
                                   LEFT OUTER JOIN
                                   ( SELECT A.Game_ID
@@ -111,7 +111,7 @@ SELECT M1.Champion
                                       FROM banpick.a_game_stat A
                                            INNER JOIN a_game B
                                         ON A.Game_ID = B.Game_ID
-                                     WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
+                                     WHERE B.Ver like 'v15%'
                                   ) B
                                ON A.Game_ID = B.Game_ID
                               AND A.Champion != B.Champion
@@ -127,7 +127,7 @@ SELECT M1.Champion
                              FROM banpick.a_game_stat A
                                   INNER JOIN a_game B
                                ON A.Game_ID = B.Game_ID
-                            WHERE B.Ver in ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13') 
+                            WHERE B.Ver like 'v15%'
                             GROUP BY A.Champion
                          ) T3
                       ON T1.Champion = T3.Champion
@@ -141,7 +141,7 @@ SELECT M1.Champion
 """
 df = pd.read_sql(query.replace('\n',' '), connection)
 
-df['Champion'] = df['Champion'].str.lower()
+df['champion'] = df['champion'].str.lower()
 df['con_champ'] = df['con_champ'].str.lower()
 
 
@@ -153,9 +153,9 @@ query2="""SELECT B.Champion
     ON A.game_ID = B.Game_ID
    AND A.Team_Div = B.Team_Div
    AND A.ROLE = B.Role
- WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')) """
+ WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver like 'v15%') """
 df2 = pd.read_sql(query2, connection)
-df2['Champion'] = df2['Champion'].str.lower()
+df2['champion'] = df2['champion'].str.lower()
 
 query3="""
 SELECT F.Champion
@@ -179,7 +179,7 @@ SELECT F.Champion
            FROM banpick.a_game_stat A
                 INNER JOIN a_game B
              ON A.Game_ID = B.Game_ID 
-          WHERE B.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')
+          WHERE B.Ver like 'v15%'
           GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
        ) F
 """
@@ -194,10 +194,10 @@ SELECT A.Game_ID
        INNER JOIN 
        banpick.a_game_stat B
     ON A.Game_ID = B.Game_ID 
- WHERE A.Ver IN ('v15.1','v15.2','v15.3','v15.4','v15.5','v15.6','v15.7','v15.8','v15.9','v15.10','v15.11','v15.12','v15.13')
+ WHERE A.Ver like 'v15%'
 """
 dmg_rate_df=pd.read_sql_query(query3,connection)
-dmg_rate_df['Champion'] = dmg_rate_df['Champion'].str.lower()
+dmg_rate_df['champion'] = dmg_rate_df['champion'].str.lower()
 avg_tank_death = dmg_rate_df['tank_death'].sum()/dmg_rate_df['tank_death'].count()
 avg_tank_time = dmg_rate_df['tank_time'].sum()/dmg_rate_df['tank_time'].count()
 dmg_rate_df['tank_death_norm']=dmg_rate_df['tank_death']/avg_tank_death
@@ -226,11 +226,11 @@ def get_replacements():
 
 
 cham_powergraph=[]
-champion_list=df2['Champion'].unique()
+champion_list=df2['champion'].unique()
 for cham in champion_list:
-    gold_df=df2[df2['Champion']==cham]
+    gold_df=df2[df2['champion']==cham]
     time_gold=[]
-    for i in gold_df['Gold_Data']:
+    for i in gold_df['gold_data']:
         data=eval(i)
         temp_list=[]
         for j in range(0,len(data)-1):
@@ -251,22 +251,22 @@ for cham in champion_list:
         power_graph.append(value)
     cham_powergraph.append([cham,power_graph])
 power_df=pd.DataFrame(cham_powergraph)
-power_df.columns = ['Champion','Gold_Data']
+power_df.columns = ['champion','gold_data']
 
 def process_teams(Blue_Team, Red_Team):
     blue_temp_list=[]
     for k in Blue_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['Champion']==k]['Ban'])
+            Ban=max(df[df['champion']==k]['Ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['Champion']==k]['Pick'])
+            Pick=max(df[df['champion']==k]['Pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
+            Win_rate=max(df[df['champion']==k]['Win_rate'])
         except ValueError:
             Win_rate=50
         Duo_score=0
@@ -276,11 +276,11 @@ def process_teams(Blue_Team, Red_Team):
             if k==i:
                 pass
             else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
                     pass
                 else:
                     try:
-                        Duo_score = Duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
+                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
                     except IndexError:
                         Duo_score = 0
         for j in Red_Team:
@@ -288,11 +288,11 @@ def process_teams(Blue_Team, Red_Team):
             if k==j:
                 pass
             else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
                     pass
                 else:
                     try:
-                        Count_score = Count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
+                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
                     except IndexError:
                         Count_score = 0
         blue_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
@@ -312,15 +312,15 @@ def process_teams(Blue_Team, Red_Team):
     for k in Red_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['Champion']==k]['Ban'])
+            Ban=max(df[df['champion']==k]['Ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['Champion']==k]['Pick'])
+            Pick=max(df[df['champion']==k]['Pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
+            Win_rate=max(df[df['champion']==k]['Win_rate'])
         except ValueError:
             Win_rate=50
         Duo_score=0
@@ -330,11 +330,11 @@ def process_teams(Blue_Team, Red_Team):
             if k==i:
                 pass
             else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
                     pass
                 else:
                     try:
-                        Duo_score = Duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
+                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
                     except IndexError:
                         Duo_score = 0
         for j in Blue_Team:
@@ -342,11 +342,11 @@ def process_teams(Blue_Team, Red_Team):
             if k==j:
                 pass
             else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
                     pass
                 else:
                     try:
-                        Count_score = Count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
+                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
                     except IndexError:
                         Count_score = 0
         red_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
@@ -427,8 +427,8 @@ def duo_chart(blue_team):
         blue_duo_2=[]
         for j in blue_team:
             if i!=j:
-                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
-                    blue_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
+                if len(df[(df['champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
+                    blue_duo_2.append(df[(df['champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
                 else :
                     blue_duo_2.append(0)
             else:
