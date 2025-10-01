@@ -8,7 +8,10 @@ import random
 import plotly.express as px
 from collections import defaultdict
 import json
-
+import xgboost as xgb
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score, roc_auc_score
 
 def get_replacements():
     with connection.cursor() as cursor:
@@ -906,17 +909,13 @@ def index(request):
             ml_game_result=[0]
         ml_temp_df2=pd.DataFrame(ml_game_result)    
         ml_temp_df2.columns=['game_result']
-       ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
-         if len(ml_df)==0:
+        ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
+        if len(ml_df)==0:
             ml_df=ml_temp_df3
         else:
             ml_df=pd.concat([ml_df,ml_temp_df3],axis=0)
     features=ml_df[['comb_score','over_atk','over_def','atk_cnt','def_cnt','gold']]
     features_result=ml_df[['game_result']]
-    import xgboost as xgb
-    from sklearn.calibration import CalibratedClassifierCV
-    from sklearn.model_selection import KFold
-    from sklearn.metrics import accuracy_score, roc_auc_score
     X= features
     y= features_result
     params = {
