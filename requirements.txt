@@ -6,3 +6,5 @@ scikit-learn # XGBoost와 함께 사용될 수 있으므로 포함
 plotly
 matplotlib
 numpy
+psycopg2-binary
+dj-database-url
