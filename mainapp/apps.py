@@ -185,7 +185,7 @@ class MainappConfig(AppConfig):
                        , round(SUM(A."Magic Damage") / SUM(A."Total damage to Champion") ,2) AS AP_rate
                        , round(SUM(A."True Damage") / SUM(A."Total damage to Champion") ,2) AS TD_rate
                        , SUM(CASE WHEN A.ROLE = 'JUNGLE' THEN A."Total damage taken" * 0.7 ELSE A."Total damage taken" END) / (SUM(A.Deaths) + count(A.Champion))  AS tank_death
-                       , avg(ROUND(CASE WHEN A.ROLE = 'JUNGLE' THEN A."Total damage taken" * 0.7 ELSE A."Total damage taken" END / ROUND((LEFT(B.Game_Time,2)*60 + RIGHT(B.Game_Time,2)) / 60,2))) AS tank_time
+                       , avg(ROUND(CASE WHEN A.ROLE = 'JUNGLE' THEN A."Total damage taken" * 0.7 ELSE A."Total damage taken" END / ROUND((CAST(LEFT(B.Game_Time,2) AS NUMERIC)*60 + CAST(RIGHT(B.Game_Time,2) AS NUMERIC)) / 60,2))) AS tank_time
                        , SUM(A."Total damage to Champion") / (SUM(A.Deaths) + count(A.Champion))  AS deal_death
                        , round(avg(A.DPM),2) AS deal_time
                     FROM banpick.a_game_stat A
@@ -194,6 +194,7 @@ class MainappConfig(AppConfig):
                    WHERE B.Ver like 'v15%'
                    GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
                 ) F
+
           """
           sql2 = """
           SELECT A.Game_ID 
