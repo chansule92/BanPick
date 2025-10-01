@@ -30,7 +30,7 @@ for i in game_list:
         else :
             game_result=game_list_df[game_list_df['game_id']==i]['red_result'].values[0]
         for k in Position_div:
-            champ_query="""SELECT Champion FROM a_game_stat where Game_ID = '{}' and Team_Div = '{}' and Role = '{}';""".format(i,j,k)
+            champ_query="""SELECT Champion FROM banpick.a_game_stat where Game_ID = '{}' and Team_Div = '{}' and Role = '{}';""".format(i,j,k)
             champ_df=pd.read_sql(champ_query, connection)
             temp_list.append((champ_df['champion'].values)[0])
             team_id[j]=[temp_list,game_result]
@@ -99,7 +99,7 @@ SELECT M1.Champion
                                          , A.Team_Div
                                          , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
                                       FROM banpick.a_game_stat A
-                                           INNER JOIN a_game B
+                                           INNER JOIN banpick.a_game B
                                         ON A.Game_ID = B.Game_ID
                                      WHERE B.Ver like 'v15%'
                                   ) A
@@ -109,7 +109,7 @@ SELECT M1.Champion
                                          , A.Team_Div
                                          , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
                                       FROM banpick.a_game_stat A
-                                           INNER JOIN a_game B
+                                           INNER JOIN banpick.a_game B
                                         ON A.Game_ID = B.Game_ID
                                      WHERE B.Ver like 'v15%'
                                   ) B
@@ -125,7 +125,7 @@ SELECT M1.Champion
                                 , sum(CASE WHEN A.Team_Div = 'Blue' AND B.Blue_Result = 'Win' THEN 1
                                            WHEN A.Team_Div = 'Red' AND B.Red_result = 'Win' THEN 1 ELSE 0 END) AS win_cnt
                              FROM banpick.a_game_stat A
-                                  INNER JOIN a_game B
+                                  INNER JOIN banpick.a_game B
                                ON A.Game_ID = B.Game_ID
                             WHERE B.Ver like 'v15%'
                             GROUP BY A.Champion
@@ -153,7 +153,7 @@ query2="""SELECT B.Champion
     ON A.game_ID = B.Game_ID
    AND A.Team_Div = B.Team_Div
    AND A.ROLE = B.Role
- WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver like 'v15%') """
+ WHERE A.Game_ID IN (SELECT game_ID FROM banpick.a_game WHERE Ver like 'v15%') """
 df2 = pd.read_sql(query2, connection)
 df2['champion'] = df2['champion'].str.lower()
 
@@ -177,7 +177,7 @@ SELECT F.Champion
               , SUM(A.`Total damage to Champion`) / (SUM(A.Deaths) + count(A.Champion))  AS deal_death
               , round(avg(A.DPM),2) AS deal_time
            FROM banpick.a_game_stat A
-                INNER JOIN a_game B
+                INNER JOIN banpick.a_game B
              ON A.Game_ID = B.Game_ID 
           WHERE B.Ver like 'v15%'
           GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
