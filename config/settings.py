@@ -21,8 +21,9 @@ import os
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = mysettings.SECRET_KEY
-DATABASES = mysettings.DATABASES
+#SECRET_KEY = mysettings.SECRET_KEY
+SECRET_KEY = os.environ.get('SECRET_KEY', mysettings.SECRET_KEY)
+#DATABASES = mysettings.DATABASES
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -34,7 +35,9 @@ ALLOWED_HOSTS = [
     'localhost',
     'ChocoPi.pythonanywhere.com'
 ]
-
+RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+if RENDER_EXTERNAL_HOSTNAME:
+    ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 # Application definition
 
@@ -119,6 +122,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    # 프로젝트 내 static 폴더가 있다면 추가합니다.
+    os.path.join(BASE_DIR, 'static_dev'), 
+]
 STATIC_ROOT = os.path.join(BASE_DIR, "static")
 
 # Default primary key field type
