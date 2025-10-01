@@ -1,0 +1,8 @@
+Django
+gunicorn  # Render와 같은 서버 환경에서 Django를 실행하기 위해 필수
+pandas
+xgboost
+scikit-learn # XGBoost와 함께 사용될 수 있으므로 포함
+plotly
+matplotlib
+numpy
