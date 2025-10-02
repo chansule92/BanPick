@@ -8,7 +8,7 @@ import xgboost as xgb
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
-import utils
+from . import utils
 
 logger = logging.getLogger(__name__)
 
