@@ -2,7 +2,6 @@
 
 from django.apps import AppConfig
 import pandas as pd
-from django.db import connection
 import logging
 import xgboost as xgb
 from sklearn.calibration import CalibratedClassifierCV
@@ -29,7 +28,7 @@ class MainappConfig(AppConfig):
           game_list_query ="""SELECT Game_ID,Blue_Result, Red_Result
            FROM banpick.a_game
           WHERE Ver like 'v15%'"""
-
+          from django.db import connection
           game_list_df = pd.read_sql(game_list_query, connection)
 
 
