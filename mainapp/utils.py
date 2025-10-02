@@ -1,7 +1,4 @@
-from django.db import connection
 import pandas as pd
-from .models import champion_index
-from django.shortcuts import render
 import plotly.graph_objects as go
 import numpy as np
 import random
@@ -9,20 +6,13 @@ import plotly.express as px
 from collections import defaultdict
 import json
 import xgboost as xgb
-from django.db import connection
 import logging
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 
 
-def get_replacements():
-    with connection.cursor() as cursor:
-        cursor.execute(sql4)
-        results = cursor.fetchall()
-    return results
-
-def process_teams(Blue_Team, Red_Team):
+def process_teams(Blue_Team, Red_Team,df):
     blue_temp_list=[]
     for k in Blue_Team:
         k=k.lower()
@@ -144,7 +134,7 @@ def time_bucket(t):
     else:
         return 'late'
         
-def gold(cham_list):
+def gold(cham_list,power_df):
     gold_result=[]
     temp_2=[]
     temp_3=[]
@@ -171,7 +161,7 @@ def gold(cham_list):
     return gold_result
 
 
-def duo_chart(blue_team):
+def duo_chart(blue_team,df):
     blue_duo=[]
     for i in blue_team:
         blue_duo_2=[]
@@ -267,7 +257,7 @@ def duo_chart(blue_team):
     ))
     return [temp_chart_code[0],synergy]
 
-def count_chart(blue_team,red_team):
+def count_chart(blue_team,red_team,df):
     blue_count=[]
     for i in blue_team:
         blue_count_2=[]
@@ -357,7 +347,7 @@ def count_tank_lines(dmg_ratios):
     return sum([1 for d in dmg_ratios if d >= 0.18])
 
 
-def power_graph(Cham_list):
+def power_graph(Cham_list,power_df):
     powerdata_list=[]
     for i in Cham_list:
         if len(power_df[power_df['Champion']==i])!=0:
@@ -439,7 +429,7 @@ def create_power_graph(power_data):
     )
     return chart_code
 
-def dmg_weight(cham_list):
+def dmg_weight(cham_list,dmg_rate_df):
     dmg_weight = []
     cham_list[-1]=cham_list[-1]+'_support'
     for i in cham_list:
@@ -521,7 +511,7 @@ def dmg_weight_chart(dmg_weight):
             div_id='THIS_IS_FIGID'+str(random.random())))
     return chart_code
 
-def damage_distribution(champion_list):
+def damage_distribution(champion_list,dmg_rate_df):
     # 챔피언 필터링
     champion_list[-1]=champion_list[-1]+'_support'
     selected_df = dmg_rate_df[dmg_rate_df['Champion'].isin(champion_list)]
@@ -571,7 +561,7 @@ def damage_distribution(champion_list):
     return [chart_code,comment]
 
 
-def ml_features(blue_team,red_team):
+def ml_features(blue_team,red_team,gold_ml_df):
     ml_temp_df=process_teams(blue_team,red_team)
     ml_temp_blue_df=dmg_weight(blue_team)
     ml_temp_red_df=dmg_weight(red_team)
