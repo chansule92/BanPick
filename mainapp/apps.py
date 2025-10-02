@@ -257,8 +257,8 @@ class MainappConfig(AppConfig):
           for i in game_list:
              sample_ml=[]
              sample=''
-             blue_gold=gold(result[i]['BLUE'][0])
-             red_gold=gold(result[i]['RED'][0])
+             blue_gold=utils.gold(result[i]['BLUE'][0])
+             red_gold=utils.gold(result[i]['RED'][0])
              sample=pd.concat([blue_gold,red_gold],axis=1)
              sample.columns=['Time','blue_gold','-','red_gold']
              sample['diff_gold']=sample['blue_gold']-sample['red_gold']
