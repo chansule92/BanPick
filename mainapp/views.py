@@ -13,7 +13,7 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 from .apps import MainappConfig 
-import utils
+from . import utils
 
 
 def index(request):
