@@ -1,3 +1,21 @@
+from django.db import connection
+import pandas as pd
+from .models import champion_index
+from django.shortcuts import render
+import plotly.graph_objects as go
+import numpy as np
+import random
+import plotly.express as px
+from collections import defaultdict
+import json
+import xgboost as xgb
+from django.db import connection
+import logging
+from sklearn.calibration import CalibratedClassifierCV
+from sklearn.model_selection import KFold
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+
 def get_replacements():
     with connection.cursor() as cursor:
         cursor.execute(sql4)
