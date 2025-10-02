@@ -55,7 +55,7 @@ class MainappConfig(AppConfig):
               , MAX(M1.BP) AS BP
               , MAX(M1.Ban) AS Ban
               , MAX(M1.Pick) AS Pick
-              , MAX(M1.total_win_rate) AS Win_rate
+              , MAX(M1.total_WIN_rate) AS WIN_rate
               , CASE WHEN MAX(M1.duo_score) = 0 THEN min(M1.duo_score) ELSE Max(M1.duo_score) end AS Duo_Score
               , CASE WHEN MAX(M1.count_score) = 0 THEN Min(M1.count_score) ELSE max(M1.count_score) END AS Count_Score
            FROM ( SELECT M.Champion
@@ -64,24 +64,24 @@ class MainappConfig(AppConfig):
                        , M.BP
                        , M.Ban
                        , M.Pick
-                       , M.total_win_cnt
-                       , M.total_win_rate
+                       , M.total_WIN_cnt
+                       , M.total_WIN_rate
                        , M.duo_play_cnt
-                       , M.duo_win_cnt
-                       , M.duo_win_rate
-                       , CASE WHEN Team_YN = 'Y' THEN M.duo_win_rate - M.total_win_rate ELSE 0 END AS duo_score
-                       , CASE WHEN Team_YN = 'N' THEN M.duo_win_rate - M.total_win_rate ELSE 0 END AS count_score
+                       , M.duo_WIN_cnt
+                       , M.duo_WIN_rate
+                       , CASE WHEN Team_YN = 'Y' THEN M.duo_WIN_rate - M.total_WIN_rate ELSE 0 END AS duo_score
+                       , CASE WHEN Team_YN = 'N' THEN M.duo_WIN_rate - M.total_WIN_rate ELSE 0 END AS count_score
                     FROM ( SELECT T1.Champion
                                 , T2.con_champ
                                 , T2.Team_YN
                                 , T1.BP
                                 , T1.Ban
                                 , T1.Pick
-                                , COALESCE(T3.win_cnt,0) AS total_win_cnt
-                                , ROUND(COALESCE(T3.win_cnt,0)/T1.Pick*100,2) AS total_win_rate
+                                , COALESCE(T3.WIN_cnt,0) AS total_WIN_cnt
+                                , ROUND(COALESCE(CAST(T3.WIN_cnt AS NUMERIC),0)/T1.Pick*100,2) AS total_WIN_rate
                                 , COALESCE(T2.play_cnt,0) AS duo_play_cnt
-                                , COALESCE(T2.win_cnt,0) AS duo_win_cnt
-                                , ROUND(COALESCE(T2.win_cnt,0)/COALESCE(T2.play_cnt,0)*100,2) AS duo_win_rate
+                                , COALESCE(T2.WIN_cnt,0) AS duo_WIN_cnt
+                                , ROUND(COALESCE(CAST(T2.WIN_cnt AS NUMERIC),0)/COALESCE(T2.play_cnt,0)*100,2) AS duo_WIN_rate
                              FROM ( SELECT Champion
                                          , count(Champion) AS BP
                                          , SUM(CASE WHEN BP_DIV = 'Ban' THEN 1 ELSE 0 END) AS Ban
@@ -107,11 +107,11 @@ class MainappConfig(AppConfig):
                                          , B.Champion AS con_champ
                                          , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END AS Team_YN
                                          , count(DISTINCT A.Game_ID) AS play_cnt
-                                         , count(DISTINCT CASE WHEN A.RESULT = 'Win' THEN A.Game_ID ELSE NULL END) AS win_cnt
+                                         , count(DISTINCT CASE WHEN A.RESULT = 'WIN' THEN A.Game_ID ELSE NULL END) AS WIN_cnt
                                       FROM ( SELECT A.Game_ID
                                                   , A.Champion
                                                   , A.Team_Div
-                                                  , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
+                                                  , CASE WHEN A.Team_Div = 'BLUE' THEN Blue_Result ELSE Red_Result END AS Result
                                                FROM banpick.a_game_stat A
                                                     INNER JOIN banpick.a_game B
                                                  ON A.Game_ID = B.Game_ID
@@ -121,7 +121,7 @@ class MainappConfig(AppConfig):
                                            ( SELECT A.Game_ID
                                                   , A.Champion
                                                   , A.Team_Div
-                                                  , CASE WHEN A.Team_Div = 'Blue' THEN Blue_Result ELSE Red_Result END AS Result
+                                                  , CASE WHEN A.Team_Div = 'BLUE' THEN Blue_Result ELSE Red_Result END AS Result
                                                FROM banpick.a_game_stat A
                                                     INNER JOIN banpick.a_game B
                                                  ON A.Game_ID = B.Game_ID
@@ -136,8 +136,8 @@ class MainappConfig(AppConfig):
                                ON T1.Champion = T2.stan_Champ
                                   LEFT OUTER JOIN
                                   ( SELECT A.Champion
-                                         , sum(CASE WHEN A.Team_Div = 'Blue' AND B.Blue_Result = 'Win' THEN 1
-                                                    WHEN A.Team_Div = 'Red' AND B.Red_result = 'Win' THEN 1 ELSE 0 END) AS win_cnt
+                                         , sum(CASE WHEN A.Team_Div = 'BLUE' AND B.Blue_Result = 'WIN' THEN 1
+                                                    WHEN A.Team_Div = 'RED' AND B.Red_result = 'WIN' THEN 1 ELSE 0 END) AS WIN_cnt
                                       FROM banpick.a_game_stat A
                                            INNER JOIN banpick.a_game B
                                         ON A.Game_ID = B.Game_ID
