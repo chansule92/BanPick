@@ -221,7 +221,7 @@ class MainappConfig(AppConfig):
           dmg_rate_df['deal_death_norm']=dmg_rate_df['deal_death']/avg_deal_death
           dmg_rate_df['deal_time_norm']=dmg_rate_df['deal_time']/avg_deal_time
           dmg_rate_df['deal_norm_total'] = dmg_rate_df['deal_death_norm'] + dmg_rate_df['deal_time_norm']
-          dmg_rate_df['Champion']=dmg_rate_df['Champion'].str.lower()
+          dmg_rate_df['champion']=dmg_rate_df['champion'].str.lower()
 
           cham_powergraph=[]
           champion_list=df2['champion'].unique()
