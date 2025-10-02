@@ -15,6 +15,11 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 from .apps import MainappConfig 
 from . import utils
 
+def get_replacements(sql4):
+    with connection.cursor() as cursor:
+        cursor.execute(sql4)
+        results = cursor.fetchall()
+    return results
 
 def index(request):
     df = MainappConfig.global_df.get('df')
