@@ -78,10 +78,10 @@ class MainappConfig(AppConfig):
                                 , T1.Ban
                                 , T1.Pick
                                 , COALESCE(T3.WIN_cnt,0) AS total_WIN_cnt
-                                , ROUND(COALESCE(CAST(T3.WIN_cnt AS NUMERIC),0)/T1.Pick*100,2) AS total_WIN_rate
+                                , CASE WHEN T1.Pick = 0 THEN 0 ELSE ROUND(COALESCE(CAST(T3.WIN_cnt AS NUMERIC),0)/T1.Pick*100,2) END AS total_WIN_rate
                                 , COALESCE(T2.play_cnt,0) AS duo_play_cnt
                                 , COALESCE(T2.WIN_cnt,0) AS duo_WIN_cnt
-                                , ROUND(COALESCE(CAST(T2.WIN_cnt AS NUMERIC),0)/COALESCE(T2.play_cnt,0)*100,2) AS duo_WIN_rate
+                                , CASE WHEN T2.play_cnt = 0 THEN 0 ELSE ROUND(COALESCE(CAST(T2.WIN_cnt AS NUMERIC),0)/COALESCE(T2.play_cnt,0)*100,2) END AS duo_WIN_rate
                              FROM ( SELECT Champion
                                          , count(Champion) AS BP
                                          , SUM(CASE WHEN BP_DIV = 'Ban' THEN 1 ELSE 0 END) AS Ban
