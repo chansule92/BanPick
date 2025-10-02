@@ -11,6 +11,32 @@ from sklearn.metrics import accuracy_score, roc_auc_score
 
 logger = logging.getLogger(__name__)
 
+def gold(cham_list):
+    gold_result=[]
+    temp_2=[]
+    temp_3=[]
+    for i in cham_list:
+        i=i.lower()
+        if len(power_df[power_df['Champion']==i]['Gold_Data']) != 0:
+            temp_2.append(power_df[power_df['Champion']==i]['Gold_Data'].iloc[0])
+    for k in range(0,35):
+        temp=[]
+        value=0
+        for u in temp_2:
+            try:
+                temp.append(u[k])
+            except:
+                pass
+        if len(temp) != 0:
+            value=round(sum(temp)/len(temp),2)
+        temp_3.append([k,value])
+    temp_gold_result=pd.DataFrame(temp_3)
+    temp_gold_result.columns=['time','gold']
+    temp_gold_result['TimeRange']=temp_gold_result['time'].apply(time_bucket)
+    temp_gold_result = temp_gold_result[~((temp_gold_result['TimeRange'] == 'late') & (temp_gold_result['gold'] == 0))]
+    gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
+    return gold_result
+
 class MainappConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'mainapp'
@@ -18,31 +44,6 @@ class MainappConfig(AppConfig):
     # (views.py에서도 이 변수를 import하여 사용하게 됩니다.)
     global_df = {} 
 
-    def gold(cham_list):
-        gold_result=[]
-        temp_2=[]
-        temp_3=[]
-        for i in cham_list:
-            i=i.lower()
-            if len(power_df[power_df['Champion']==i]['Gold_Data']) != 0:
-                temp_2.append(power_df[power_df['Champion']==i]['Gold_Data'].iloc[0])
-        for k in range(0,35):
-            temp=[]
-            value=0
-            for u in temp_2:
-                try:
-                    temp.append(u[k])
-                except:
-                    pass
-            if len(temp) != 0:
-                value=round(sum(temp)/len(temp),2)
-            temp_3.append([k,value])
-        temp_gold_result=pd.DataFrame(temp_3)
-        temp_gold_result.columns=['time','gold']
-        temp_gold_result['TimeRange']=temp_gold_result['time'].apply(time_bucket)
-        temp_gold_result = temp_gold_result[~((temp_gold_result['TimeRange'] == 'late') & (temp_gold_result['gold'] == 0))]
-        gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
-        return gold_result
     
     def ready(self):
         # 서버 시작 시 딱 한 번만 실행됩니다.
