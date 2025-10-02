@@ -58,20 +58,20 @@ def result(request):
         else:
             red_team.append(i.replace('%20',' '))
         count=count+1
-    pred = final_model.predict(ml_features(blue_team,red_team))
-    pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
+    pred = final_model.predict(utils.ml_features(blue_team,red_team))
+    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
-    temp_chart_code.append(duo_chart(blue_team)[0])
-    temp_chart_code.append(count_chart(blue_team,red_team)[0])
-    temp_chart_code.append(duo_chart(red_team)[0])
-    temp_chart_code.append(count_chart(red_team,blue_team)[0])
-    temp_chart_code.append(create_power_graph(power_graph(blue_team)))
-    temp_chart_code.append(create_power_graph(power_graph(red_team)))
-    temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
-    temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
-    temp_chart_code.append(damage_distribution(blue_team)[0])
-    temp_chart_code.append(damage_distribution(red_team)[0])
+    temp_chart_code.append(utils.duo_chart(blue_team)[0])
+    temp_chart_code.append(utils.count_chart(blue_team,red_team)[0])
+    temp_chart_code.append(utils.duo_chart(red_team)[0])
+    temp_chart_code.append(utils.count_chart(red_team,blue_team)[0])
+    temp_chart_code.append(utils.create_power_graph(utils.power_graph(blue_team)))
+    temp_chart_code.append(utils.create_power_graph(utils.power_graph(red_team)))
+    temp_chart_code.append(utils.dmg_weight_chart(utils.dmg_weight(blue_team)))
+    temp_chart_code.append(utils.dmg_weight_chart(utils.dmg_weight(red_team)))
+    temp_chart_code.append(utils.damage_distribution(blue_team)[0])
+    temp_chart_code.append(utils.damage_distribution(red_team)[0])
     test=power_df
     print(blue_team)
     print(red_team)
@@ -107,7 +107,7 @@ def report(request):
     print(red_team)
     blue_gold_comment_code=[]
     red_gold_comment_code=[]
-    gold_comment=pd.concat([gold(blue_team),gold(red_team)],axis=1)
+    gold_comment=pd.concat([utils.gold(blue_team),utils.gold(red_team)],axis=1)
     gold_comment.columns=['Time','blue_gold','-','red_gold']
     gold_comment['diff_gold']=gold_comment['blue_gold']-gold_comment['red_gold']
     if float(gold_comment[gold_comment['Time']=='early']['diff_gold'].iloc[0]) >= 10 :
@@ -137,34 +137,34 @@ def report(request):
     else:
         blue_gold_comment_code.append('대등')
         red_gold_comment_code.append('대등')
-    pred = final_model.predict(ml_features(blue_team,red_team))
-    pred_proba = final_model.predict_proba(ml_features(blue_team,red_team))[:, 1]
+    pred = final_model.predict(utils.ml_features(blue_team,red_team))
+    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
-    temp_chart_code.append(duo_chart(blue_team)[0])
-    temp_chart_code.append(count_chart(blue_team,red_team)[0])
-    temp_chart_code.append(duo_chart(red_team)[0])
-    temp_chart_code.append(count_chart(red_team,blue_team)[0])
-    temp_chart_code.append(create_power_graph(power_graph(blue_team)))
-    temp_chart_code.append(create_power_graph(power_graph(red_team)))
-    temp_chart_code.append(dmg_weight_chart(dmg_weight(blue_team)))
-    temp_chart_code.append(dmg_weight_chart(dmg_weight(red_team)))
-    temp_chart_code.append(damage_distribution(blue_team)[0])
-    temp_chart_code.append(damage_distribution(red_team)[0])
+    temp_chart_code.append(utils.duo_chart(blue_team)[0])
+    temp_chart_code.append(utils.count_chart(blue_team,red_team)[0])
+    temp_chart_code.append(utils.duo_chart(red_team)[0])
+    temp_chart_code.append(utils.count_chart(red_team,blue_team)[0])
+    temp_chart_code.append(utils.create_power_graph(utils.power_graph(blue_team)))
+    temp_chart_code.append(utils.create_power_graph(utils.power_graph(red_team)))
+    temp_chart_code.append(utils.dmg_weight_chart(utils.dmg_weight(blue_team)))
+    temp_chart_code.append(utils.dmg_weight_chart(utils.dmg_weight(red_team)))
+    temp_chart_code.append(utils.damage_distribution(blue_team)[0])
+    temp_chart_code.append(utils.damage_distribution(red_team)[0])
     test=power_df
     comment_code=[]
-    comment_code.append(duo_chart(blue_team)[1])
-    comment_code.append(count_chart(blue_team,red_team)[1])
-    comment_code.append(duo_chart(red_team)[1])
-    comment_code.append(count_chart(red_team,blue_team)[1])
+    comment_code.append(utils.duo_chart(blue_team)[1])
+    comment_code.append(utils.count_chart(blue_team,red_team)[1])
+    comment_code.append(utils.duo_chart(red_team)[1])
+    comment_code.append(utils.count_chart(red_team,blue_team)[1])
     comment_code.append(blue_gold_comment_code)
     comment_code.append(red_gold_comment_code)
-    comment_code.append(dmg_weight_chart_comment(blue_team,red_team))
-    comment_code.append(dmg_weight_chart_comment(red_team,blue_team))
-    comment_code.append(damage_distribution(blue_team)[1])
-    comment_code.append(damage_distribution(red_team)[1])
+    comment_code.append(utils.dmg_weight_chart_comment(blue_team,red_team))
+    comment_code.append(utils.dmg_weight_chart_comment(red_team,blue_team))
+    comment_code.append(utils.damage_distribution(blue_team)[1])
+    comment_code.append(utils.damage_distribution(red_team)[1])
 
-    replacements = get_replacements()
+    replacements = utils.get_replacements()
     replacements_json = json.dumps(replacements)
 
     context = {
