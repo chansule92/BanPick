@@ -140,8 +140,8 @@ def gold(cham_list,power_df):
     temp_3=[]
     for i in cham_list:
         i=i.lower()
-        if len(power_df[power_df['champion']==i]['Gold_Data']) != 0:
-            temp_2.append(power_df[power_df['champion']==i]['Gold_Data'].iloc[0])
+        if len(power_df[power_df['champion']==i]['gold_data']) != 0:
+            temp_2.append(power_df[power_df['champion']==i]['gold_data'].iloc[0])
     for k in range(0,35):
         temp=[]
         value=0
