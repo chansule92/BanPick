@@ -2,7 +2,7 @@
 
 from django.apps import AppConfig
 import pandas as pd
-import numpy as pd
+import numpy as np
 import logging
 import xgboost as xgb
 from sklearn.calibration import CalibratedClassifierCV
