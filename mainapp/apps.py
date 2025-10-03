@@ -274,7 +274,7 @@ class MainappConfig(AppConfig):
           gold_ml_df
           ml_df=[]
           for i in game_list:
-             ml_temp_df=utils.ml_features(result[i]['BLUE'][0],result[i]['RED'][0],gold_ml_df)
+             ml_temp_df=utils.ml_features(result[i]['BLUE'][0],result[i]['RED'][0],gold_ml_df,df, dmg_rate_df)
              if result[i]['BLUE'][1] == 'WIN':
                  ml_game_result=[1]
              else:
