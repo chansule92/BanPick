@@ -17,7 +17,7 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Blue_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['champion']==k]['Ban'])
+            Ban=max(df[df['champion']==k]['ban'])
         except ValueError:
             Ban=0
         try:
@@ -71,7 +71,7 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Red_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['champion']==k]['Ban'])
+            Ban=max(df[df['champion']==k]['ban'])
         except ValueError:
             Ban=0
         try:
