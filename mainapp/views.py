@@ -52,7 +52,7 @@ def result(request):
         selected_champions = request.POST.getlist('champion')
     stats = []
     for i in selected_champions:
-        stats.append([df[df['Champion']==i.replace('%20',' ')]['ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
+        stats.append([df[df['Champion']==i.replace('%20',' ')]['ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['win_rate'].head(1).values])
     temp_chart_code=[]
     count=0
     blue_team = []
@@ -95,7 +95,7 @@ def report(request):
         selected_champions = request.POST.getlist('champion')
     stats = []
     for i in selected_champions:
-        stats.append([df[df['Champion']==i.replace('%20',' ')]['ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['Win_rate'].head(1).values])
+        stats.append([df[df['Champion']==i.replace('%20',' ')]['ban'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['pick'].head(1).values,df[df['Champion']==i.replace('%20',' ')]['win_rate'].head(1).values])
     temp_chart_code=[]
     count=0
     blue_team = []
