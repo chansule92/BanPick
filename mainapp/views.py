@@ -164,8 +164,8 @@ def report(request):
     comment_code.append(utils.count_chart(red_team,blue_team,df)[1])
     comment_code.append(blue_gold_comment_code)
     comment_code.append(red_gold_comment_code)
-    comment_code.append(utils.dmg_weight_chart_comment(blue_team,red_team))
-    comment_code.append(utils.dmg_weight_chart_comment(red_team,blue_team))
+    comment_code.append(utils.dmg_weight_chart_comment(blue_team,red_team,dmg_rate_df))
+    comment_code.append(utils.dmg_weight_chart_comment(red_team,blue_team,dmg_rate_df))
     comment_code.append(utils.damage_distribution(blue_team,dmg_rate_df)[1])
     comment_code.append(utils.damage_distribution(red_team,dmg_rate_df)[1])
 
