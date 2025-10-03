@@ -63,8 +63,8 @@ def result(request):
         else:
             red_team.append(i.replace('%20',' '))
         count=count+1
-    pred = final_model.predict(utils.ml_features(blue_team,red_team,gold_ml_df))
-    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team,gold_ml_df))[:, 1]
+    pred = final_model.predict(utils.ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df))
+    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
     temp_chart_code.append(utils.duo_chart(blue_team,df)[0])
@@ -142,8 +142,8 @@ def report(request):
     else:
         blue_gold_comment_code.append('대등')
         red_gold_comment_code.append('대등')
-    pred = final_model.predict(utils.ml_features(blue_team,red_team,gold_ml_df))
-    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team,gold_ml_df))[:, 1]
+    pred = final_model.predict(utils.ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df))
+    pred_proba = final_model.predict_proba(utils.ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df))[:, 1]
     result_df = [round(pred_proba[0]*100,1),round((1-pred_proba[0])*100,1)]
     temp_chart_code = []
     temp_chart_code.append(utils.duo_chart(blue_team,df)[0])
