@@ -561,10 +561,10 @@ def damage_distribution(champion_list,dmg_rate_df):
     return [chart_code,comment]
 
 
-def ml_features(blue_team,red_team,gold_ml_df):
-    ml_temp_df=process_teams(blue_team,red_team)
-    ml_temp_blue_df=dmg_weight(blue_team)
-    ml_temp_red_df=dmg_weight(red_team)
+def ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df):
+    ml_temp_df=process_teams(blue_team,red_team,df)
+    ml_temp_blue_df=dmg_weight(blue_team,dmg_rate_df)
+    ml_temp_red_df=dmg_weight(red_team,dmg_rate_df)
     blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
     blue_total_def = sum([item[2] for item in ml_temp_blue_df])
     red_total_atk = sum([item[1] for item in ml_temp_red_df])
@@ -599,7 +599,7 @@ def ml_features(blue_team,red_team,gold_ml_df):
     features=test_df
     return features
   
-def dmg_weight_chart_comment(blue_team,red_team):
+def dmg_weight_chart_comment(blue_team,red_team,dmg_rate_df):
     comment_code=''
     # 1 <- 변경예정
     if ml_features(blue_team,red_team)['over_atk'].iloc[0] >= 1 :
@@ -614,7 +614,7 @@ def dmg_weight_chart_comment(blue_team,red_team):
         comment_code_3='부족'
     else:
         comment_code_3='적정'
-    ml_temp_blue_df=dmg_weight(blue_team)
+    ml_temp_blue_df=dmg_weight(blue_team,dmg_rate_df)
     blue_total_atk = sum([item[1] for item in ml_temp_blue_df])
     blue_total_def = sum([item[2] for item in ml_temp_blue_df])
     blue_temp_atk=[]
