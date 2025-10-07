@@ -47,11 +47,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==j:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==j)]['count_score']) == 0:
                     pass
                 else:
                     try:
-                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
+                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
                     except IndexError:
                         Count_score = 0
         blue_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
