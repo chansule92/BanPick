@@ -35,11 +35,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==i:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
+                if len(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score']) == 0:
                     pass
                 else:
                     try:
-                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
+                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
                     except IndexError:
                         Duo_score = 0
         for j in Red_Team:
