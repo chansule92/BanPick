@@ -262,8 +262,8 @@ def count_chart(blue_team,red_team,df):
     for i in blue_team:
         blue_count_2=[]
         for k in red_team:
-            if len(df[(df['champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
-                blue_count_2.append(df[(df['champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
+            if len(df[(df['champion'] == i) & (df['con_champ'] == k)]['count_score']) != 0:
+                blue_count_2.append(df[(df['champion'] == i) & (df['con_champ'] == k)]['count_score'].iloc[0])
             else :
                 blue_count_2.append(0)
         blue_count.append(blue_count_2)
