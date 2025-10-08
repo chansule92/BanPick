@@ -167,8 +167,8 @@ def duo_chart(blue_team,df):
         blue_duo_2=[]
         for j in blue_team:
             if i!=j:
-                if len(df[(df['champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
-                    blue_duo_2.append(df[(df['champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
+                if len(df[(df['champion'] == i) & (df['con_champ'] == j)]['duo_score']) != 0:
+                    blue_duo_2.append(df[(df['champion'] == i) & (df['con_champ'] == j)]['duo_score'].iloc[0])
                 else :
                     blue_duo_2.append(0)
             else:
