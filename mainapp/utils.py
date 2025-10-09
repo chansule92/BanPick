@@ -599,18 +599,18 @@ def ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df):
     features=test_df
     return features
   
-def dmg_weight_chart_comment(blue_team,red_team,dmg_rate_df):
+def dmg_weight_chart_comment(blue_team,red_team,gold_ml_df,df,dmg_rate_df):
     comment_code=''
     # 1 <- 변경예정
-    if ml_features(blue_team,red_team)['over_atk'].iloc[0] >= 1 :
+    if ml_features(blue_team,red_team,gold_ml_df,df,dmg_rate_df)['over_atk'].iloc[0] >= 1 :
         comment_code='충만'
-    elif ml_features(blue_team,red_team)['over_atk'].iloc[0] <= -1:
+    elif ml_features(blue_team,red_team,gold_ml_df,df,dmg_rate_df)['over_atk'].iloc[0] <= -1:
         comment_code='부족'
     else:
         comment_code='적정'
-    if ml_features(blue_team,red_team)['over_def'].iloc[0] >= 1 :
+    if ml_features(blue_team,red_team,gold_ml_df,df,dmg_rate_df)['over_def'].iloc[0] >= 1 :
         comment_code_3='충만'
-    elif ml_features(blue_team,red_team)['over_def'].iloc[0] <= -1:
+    elif ml_features(blue_team,red_team,gold_ml_df,df,dmg_rate_df)['over_def'].iloc[0] <= -1:
         comment_code_3='부족'
     else:
         comment_code_3='적정'
