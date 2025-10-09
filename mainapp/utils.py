@@ -28,8 +28,8 @@ def process_teams(Blue_Team, Red_Team,df):
             Win_rate=max(df[df['champion']==k]['win_rate'])
         except ValueError:
             Win_rate=50
-        Duo_score=0
-        Count_score=0
+        duo_score=0
+        count_score=0
         for i in Blue_Team:
             i=i.lower()
             if k==i:
@@ -39,9 +39,9 @@ def process_teams(Blue_Team, Red_Team,df):
                     pass
                 else:
                     try:
-                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
+                        duo_score = duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
                     except IndexError:
-                        Duo_score = 0
+                        duo_score = 0
         for j in Red_Team:
             j=j.lower()
             if k==j:
@@ -51,10 +51,10 @@ def process_teams(Blue_Team, Red_Team,df):
                     pass
                 else:
                     try:
-                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
+                        count_score = count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
                     except IndexError:
-                        Count_score = 0
-        blue_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
+                        count_score = 0
+        blue_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
     #blue_temp_list=[0 if pd.isna(x) else x for x in blue_temp_list]
     sum1=0
     sum2=0
@@ -82,8 +82,8 @@ def process_teams(Blue_Team, Red_Team,df):
             Win_rate=max(df[df['champion']==k]['win_rate'])
         except ValueError:
             Win_rate=50
-        Duo_score=0
-        Count_score=0
+        duo_score=0
+        count_score=0
         for i in Red_Team:
             i=i.lower()
             if k==i:
@@ -93,9 +93,9 @@ def process_teams(Blue_Team, Red_Team,df):
                     pass
                 else:
                     try:
-                        Duo_score = Duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
+                        duo_score = duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
                     except IndexError:
-                        Duo_score = 0
+                        duo_score = 0
         for j in Blue_Team:
             j=j.lower()
             if k==j:
@@ -105,10 +105,10 @@ def process_teams(Blue_Team, Red_Team,df):
                     pass
                 else:
                     try:
-                        Count_score = Count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
+                        count_score = count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
                     except IndexError:
-                        Count_score = 0
-        red_temp_list.append([Ban,Pick,Win_rate,round(Duo_score,2),round(Count_score,2)])
+                        count_score = 0
+        red_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
     sum6=0
     sum7=0
     sum8=0
