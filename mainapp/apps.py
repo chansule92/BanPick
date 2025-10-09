@@ -58,8 +58,8 @@ class MainappConfig(AppConfig):
               , MAX(M1.Ban) AS Ban
               , MAX(M1.Pick) AS Pick
               , MAX(M1.total_WIN_rate) AS WIN_rate
-              , CASE WHEN MAX(M1.duo_score) = 0 THEN min(M1.duo_score) ELSE Max(M1.duo_score) end AS Duo_Score
-              , CASE WHEN MAX(M1.count_score) = 0 THEN Min(M1.count_score) ELSE max(M1.count_score) END AS Count_Score
+              , CASE WHEN MAX(M1.duo_score) = 0 THEN min(M1.duo_score) ELSE Max(M1.duo_score) end AS duo_score
+              , CASE WHEN MAX(M1.count_score) = 0 THEN Min(M1.count_score) ELSE max(M1.count_score) END AS count_score
            FROM ( SELECT M.Champion
                        , M.con_champ
                        , M.Team_YN
