@@ -25,58 +25,58 @@ class MainappConfig(AppConfig):
         logger.info("Starting data pre-loading for mainapp...")
 
         try:
-            full_data_query = """
-            SELECT t1.Game_ID
-                 , t1.Blue_Result
-                 , t1.Red_Result
-                 , t2.Team_Div
-                 , t2.Role
-                 , t2.Champion
-              FROM banpick.a_game t1
-                   INNER JOIN banpick.a_game_stat t2 
-                ON t1.Game_ID = t2.Game_ID
-             WHERE t1.Ver LIKE 'v15%'
-             ORDER BY t1.Game_ID
-                 , t2.Team_Div
-                 , t2.Role;
-            """
-            
-            # DB에서 모든 데이터를 한 번에 로드합니다.
-            df_full = pd.read_sql(full_data_query, connect_to_db())
-            
-            # 필요한 열의 이름을 소문자로 표준화하는 것이 좋습니다.
-            df_full.columns = df_full.columns.str.lower()
-            
-            df_champs = df_full.groupby(['game_id', 'team_div'])['champion'].apply(list).reset_index(name='team_composition')
-            
-            # 결과(Result) 열을 각 팀별로 가져옵니다.
-            df_results = df_full[['game_id', 'team_div', 'blue_result', 'red_result']].drop_duplicates()
-            df_results['game_result'] = df_results.apply(
-                lambda row: row['blue_result'] if row['team_div'] == 'BLUE' else row['red_result'], axis=1
-            )
-            df_results = df_results[['game_id', 'team_div', 'game_result']]
-            
-            # 두 데이터프레임을 병합합니다.
-            df_final = pd.merge(df_champs, df_results, on=['game_id', 'team_div'])
-            
-            # 최종 'result' 딕셔너리 형태로 변환합니다.
-            # (이 부분이 원래 코드의 최종 목적과 가장 비슷하게 데이터를 재구성합니다.)
-            result = {}
-            for game_id in df_final['game_id'].unique():
-                game_data = df_final[df_final['game_id'] == game_id]
-                
-                team_data = {}
-                for team in ['blue', 'red']:
-                    team_row = game_data[game_data['team_div'] == team.upper()]
-                    
-                    if not team_row.empty:
-                        # [챔피언 리스트, 결과] 형태로 저장
-                        composition = team_row['team_composition'].values[0]
-                        game_result = team_row['game_result'].values[0]
-                        team_data[team.upper()] = [composition, game_result]
-                        
-                if team_data:
-                    result[game_id] = team_data
+          full_data_query = """
+          SELECT t1.Game_ID
+               , t1.Blue_Result
+               , t1.Red_Result
+               , t2.Team_Div
+               , t2.Role
+               , t2.Champion
+            FROM banpick.a_game t1
+                 INNER JOIN banpick.a_game_stat t2 
+              ON t1.Game_ID = t2.Game_ID
+           WHERE t1.Ver LIKE 'v15%'
+           ORDER BY t1.Game_ID
+               , t2.Team_Div
+               , t2.Role;
+          """
+          
+          # DB에서 모든 데이터를 한 번에 로드합니다.
+          df_full = pd.read_sql(full_data_query, connect_to_db())
+          
+          # 필요한 열의 이름을 소문자로 표준화하는 것이 좋습니다.
+          df_full.columns = df_full.columns.str.lower()
+          
+          df_champs = df_full.groupby(['game_id', 'team_div'])['champion'].apply(list).reset_index(name='team_composition')
+          
+          # 결과(Result) 열을 각 팀별로 가져옵니다.
+          df_results = df_full[['game_id', 'team_div', 'blue_result', 'red_result']].drop_duplicates()
+          df_results['game_result'] = df_results.apply(
+              lambda row: row['blue_result'] if row['team_div'] == 'BLUE' else row['red_result'], axis=1
+          )
+          df_results = df_results[['game_id', 'team_div', 'game_result']]
+          
+          # 두 데이터프레임을 병합합니다.
+          df_final = pd.merge(df_champs, df_results, on=['game_id', 'team_div'])
+          
+          # 최종 'result' 딕셔너리 형태로 변환합니다.
+          # (이 부분이 원래 코드의 최종 목적과 가장 비슷하게 데이터를 재구성합니다.)
+          result = {}
+          for game_id in df_final['game_id'].unique():
+              game_data = df_final[df_final['game_id'] == game_id]
+              
+              team_data = {}
+              for team in ['blue', 'red']:
+                  team_row = game_data[game_data['team_div'] == team.upper()]
+                  
+                  if not team_row.empty:
+                      # [챔피언 리스트, 결과] 형태로 저장
+                      composition = team_row['team_composition'].values[0]
+                      game_result = team_row['game_result'].values[0]
+                      team_data[team.upper()] = [composition, game_result]
+                      
+              if team_data:
+                  result[game_id] = team_data
           query = """
           SELECT M1.Champion
               , M1.con_champ
