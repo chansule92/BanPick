@@ -42,7 +42,7 @@ class MainappConfig(AppConfig):
           """
           
           # DB에서 모든 데이터를 한 번에 로드합니다.
-          df_full = pd.read_sql(full_data_query, connect_to_db())
+          df_full = pd.read_sql(full_data_query, connection)
           
           # 필요한 열의 이름을 소문자로 표준화하는 것이 좋습니다.
           df_full.columns = df_full.columns.str.lower()
