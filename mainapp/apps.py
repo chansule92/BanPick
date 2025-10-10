@@ -78,6 +78,7 @@ class MainappConfig(AppConfig):
                       
               if team_data:
                   result[game_id] = team_data
+          game_list = list(result.keys())
           query = """
           SELECT M1.Champion
               , M1.con_champ
