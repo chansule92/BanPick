@@ -10,7 +10,9 @@ from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 from . import utils
+import joblib
 import os
+from django.conf import settings # <-- 이 줄을 추가해야 합니다!
 
 logger = logging.getLogger(__name__)
 
