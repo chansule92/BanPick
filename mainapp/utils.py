@@ -17,15 +17,15 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Blue_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['champion']==k]['ban'])
+            Ban=max(df[df['Champion']==k]['ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['champion']==k]['pick'])
+            Pick=max(df[df['Champion']==k]['pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['champion']==k]['win_rate'])
+            Win_rate=max(df[df['Champion']==k]['win_rate'])
         except ValueError:
             Win_rate=50
         duo_score=0
@@ -35,11 +35,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==i:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score']) == 0:
+                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
                     pass
                 else:
                     try:
-                        duo_score = duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
+                        duo_score = duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
                     except IndexError:
                         duo_score = 0
         for j in Red_Team:
@@ -47,11 +47,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==j:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==j)]['count_score']) == 0:
+                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
                     pass
                 else:
                     try:
-                        count_score = count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
+                        count_score = count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
                     except IndexError:
                         count_score = 0
         blue_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
@@ -71,15 +71,15 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Red_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['champion']==k]['ban'])
+            Ban=max(df[df['Champion']==k]['ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['champion']==k]['pick'])
+            Pick=max(df[df['Champion']==k]['pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['champion']==k]['win_rate'])
+            Win_rate=max(df[df['Champion']==k]['win_rate'])
         except ValueError:
             Win_rate=50
         duo_score=0
@@ -89,11 +89,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==i:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score']) == 0:
+                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
                     pass
                 else:
                     try:
-                        duo_score = duo_score + float(df[(df['champion']==k)&(df['con_champ']==i)]['duo_score'].iloc[0])
+                        duo_score = duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
                     except IndexError:
                         duo_score = 0
         for j in Blue_Team:
@@ -101,11 +101,11 @@ def process_teams(Blue_Team, Red_Team,df):
             if k==j:
                 pass
             else :
-                if len(df[(df['champion']==k)&(df['con_champ']==j)]['count_score']) == 0:
+                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
                     pass
                 else:
                     try:
-                        count_score = count_score+ float(df[(df['champion']==k)&(df['con_champ']==j)]['count_score'].iloc[0])
+                        count_score = count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
                     except IndexError:
                         count_score = 0
         red_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
@@ -140,8 +140,8 @@ def gold(cham_list,power_df):
     temp_3=[]
     for i in cham_list:
         i=i.lower()
-        if len(power_df[power_df['champion']==i]['gold_data']) != 0:
-            temp_2.append(power_df[power_df['champion']==i]['gold_data'].iloc[0])
+        if len(power_df[power_df['Champion']==i]['gold_data']) != 0:
+            temp_2.append(power_df[power_df['Champion']==i]['gold_data'].iloc[0])
     for k in range(0,35):
         temp=[]
         value=0
@@ -167,8 +167,8 @@ def duo_chart(blue_team,df):
         blue_duo_2=[]
         for j in blue_team:
             if i!=j:
-                if len(df[(df['champion'] == i) & (df['con_champ'] == j)]['duo_score']) != 0:
-                    blue_duo_2.append(df[(df['champion'] == i) & (df['con_champ'] == j)]['duo_score'].iloc[0])
+                if len(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score']) != 0:
+                    blue_duo_2.append(df[(df['Champion'] == i) & (df['con_champ'] == j)]['Duo_Score'].iloc[0])
                 else :
                     blue_duo_2.append(0)
             else:
@@ -262,8 +262,8 @@ def count_chart(blue_team,red_team,df):
     for i in blue_team:
         blue_count_2=[]
         for k in red_team:
-            if len(df[(df['champion'] == i) & (df['con_champ'] == k)]['count_score']) != 0:
-                blue_count_2.append(df[(df['champion'] == i) & (df['con_champ'] == k)]['count_score'].iloc[0])
+            if len(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score']) != 0:
+                blue_count_2.append(df[(df['Champion'] == i) & (df['con_champ'] == k)]['Count_Score'].iloc[0])
             else :
                 blue_count_2.append(0)
         blue_count.append(blue_count_2)
@@ -350,9 +350,9 @@ def count_tank_lines(dmg_ratios):
 def power_graph(Cham_list,power_df):
     powerdata_list=[]
     for i in Cham_list:
-        if len(power_df[power_df['champion']==i])!=0:
+        if len(power_df[power_df['Champion']==i])!=0:
             temp_str=''
-            temp_str=temp_str+power_df[power_df['champion']==i].iloc[0][0]+str(power_df[power_df['champion']==i].iloc[0][1])
+            temp_str=temp_str+power_df[power_df['Champion']==i].iloc[0][0]+str(power_df[power_df['Champion']==i].iloc[0][1])
             powerdata_list.append(temp_str)
     return powerdata_list
 
@@ -434,12 +434,12 @@ def dmg_weight(cham_list,dmg_rate_df):
     cham_list[-1]=cham_list[-1]+'_support'
     for i in cham_list:
         i=i.lower()
-        if len(dmg_rate_df[dmg_rate_df['champion'] == i])==0:
+        if len(dmg_rate_df[dmg_rate_df['Champion'] == i])==0:
             deal_norm_total=0
             tank_norm_total=0
         else:
-            deal_norm_total = dmg_rate_df[dmg_rate_df['champion'] == i]['deal_norm_total'].iloc[0]
-            tank_norm_total = dmg_rate_df[dmg_rate_df['champion'] == i]['tank_norm_total'].iloc[0]
+            deal_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['deal_norm_total'].iloc[0]
+            tank_norm_total = dmg_rate_df[dmg_rate_df['Champion'] == i]['tank_norm_total'].iloc[0]
         champ_name = i.replace('_support', '')  # '_support' 자동 제거
         dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
     cham_list[-1]=cham_list[-1].replace('_support','')
@@ -514,7 +514,7 @@ def dmg_weight_chart(dmg_weight):
 def damage_distribution(champion_list,dmg_rate_df):
     # 챔피언 필터링
     champion_list[-1]=champion_list[-1]+'_support'
-    selected_df = dmg_rate_df[dmg_rate_df['champion'].isin(champion_list)]
+    selected_df = dmg_rate_df[dmg_rate_df['Champion'].isin(champion_list)]
     
     # 총합 계산
     total_AD_p = selected_df['AD_p'].sum()
