@@ -17,15 +17,15 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Blue_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['Champion']==k]['ban'])
+            Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['Champion']==k]['pick'])
+            Pick=max(df[df['Champion']==k]['Pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['Champion']==k]['win_rate'])
+            Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
             Win_rate=50
         duo_score=0
@@ -71,15 +71,15 @@ def process_teams(Blue_Team, Red_Team,df):
     for k in Red_Team:
         k=k.lower()
         try:
-            Ban=max(df[df['Champion']==k]['ban'])
+            Ban=max(df[df['Champion']==k]['Ban'])
         except ValueError:
             Ban=0
         try:
-            Pick=max(df[df['Champion']==k]['pick'])
+            Pick=max(df[df['Champion']==k]['Pick'])
         except ValueError:
             Pick=0
         try:
-            Win_rate=max(df[df['Champion']==k]['win_rate'])
+            Win_rate=max(df[df['Champion']==k]['Win_rate'])
         except ValueError:
             Win_rate=50
         duo_score=0
