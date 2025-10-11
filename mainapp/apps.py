@@ -31,12 +31,9 @@ class MainappConfig(AppConfig):
         try:
 
           DATA_DIR = os.path.join(settings.BASE_DIR, 'data')
-          
-          # -----------------------------------------------------
-          # 1. CSV 파일 로드 (DataFrame)
-          
-          global df_global
-          df_global = pd.read_csv(os.path.join(DATA_DIR, 'df.csv'))
+        
+          global df
+          df = pd.read_csv(os.path.join(DATA_DIR, 'df.csv'))
           
           global dmg_rate_df
           dmg_rate_df = pd.read_csv(os.path.join(DATA_DIR, 'dmg_rate_df.csv'))
@@ -47,10 +44,7 @@ class MainappConfig(AppConfig):
           global power_df
           power_df = pd.read_csv(os.path.join(DATA_DIR, 'power_df.csv'))
             
-          # -----------------------------------------------------
-          # 2. PKL 파일 로드 (ML 모델)
-          
-          global ml_model # 모델 객체에 사용하던 전역 변수명으로 변경하세요
+          global result
           result = joblib.load(os.path.join(DATA_DIR, 'result.pkl'))
           game_list = list(result.keys())
 
