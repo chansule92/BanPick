@@ -52,6 +52,7 @@ class MainappConfig(AppConfig):
           
           global ml_model # 모델 객체에 사용하던 전역 변수명으로 변경하세요
           result = joblib.load(os.path.join(DATA_DIR, 'result.pkl'))
+          game_list = list(result.keys())
 
           ml_df=[]
           for i in game_list:
