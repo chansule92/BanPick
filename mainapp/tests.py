@@ -1,133 +1,274 @@
-import pandas as pd
-import pymysql
-game_list_query ="""SELECT B.Champion
-     , A.Gold_Data
-     , A.CS_Data 
-  FROM a_game_timeline A
-       INNER JOIN a_game_stat B
-    ON A.game_ID = B.Game_ID 
-   AND A.Team_Div = B.Team_Div 
-   AND A.ROLE = B.Role
- WHERE A.Game_ID IN (SELECT game_ID FROM a_game WHERE Ver IN ('v15.1','v15.2'))"""
+          full_data_query = """
+          SELECT t1.Game_ID
+               , t1.Blue_Result
+               , t1.Red_Result
+               , t2.Team_Div
+               , t2.Role
+               , t2.Champion
+            FROM banpick.a_game t1
+                 INNER JOIN banpick.a_game_stat t2 
+              ON t1.Game_ID = t2.Game_ID
+           WHERE t1.Ver LIKE 'v15%'
+           ORDER BY t1.Game_ID
+               , t2.Team_Div
+               , t2.Role;
+          """
+          
+          # DB에서 모든 데이터를 한 번에 로드합니다.
+          df_full = pd.read_sql(full_data_query, connection)
+          
+          # 필요한 열의 이름을 소문자로 표준화하는 것이 좋습니다.
+          df_full.columns = df_full.columns.str.lower()
+          
+          df_champs = df_full.groupby(['game_id', 'team_div'])['champion'].apply(list).reset_index(name='team_composition')
+          
+          # 결과(Result) 열을 각 팀별로 가져옵니다.
+          df_results = df_full[['game_id', 'team_div', 'blue_result', 'red_result']].drop_duplicates()
+          df_results['game_result'] = df_results.apply(
+              lambda row: row['blue_result'] if row['team_div'] == 'BLUE' else row['red_result'], axis=1
+          )
+          df_results = df_results[['game_id', 'team_div', 'game_result']]
+          
+          # 두 데이터프레임을 병합합니다.
+          df_final = pd.merge(df_champs, df_results, on=['game_id', 'team_div'])
+          
+          # 최종 'result' 딕셔너리 형태로 변환합니다.
+          # (이 부분이 원래 코드의 최종 목적과 가장 비슷하게 데이터를 재구성합니다.)
+          result = {}
+          for game_id in df_final['game_id'].unique():
+              game_data = df_final[df_final['game_id'] == game_id]
+              
+              team_data = {}
+              for team in ['blue', 'red']:
+                  team_row = game_data[game_data['team_div'] == team.upper()]
+                  
+                  if not team_row.empty:
+                      # [챔피언 리스트, 결과] 형태로 저장
+                      composition = team_row['team_composition'].values[0]
+                      game_result = team_row['game_result'].values[0]
+                      team_data[team.upper()] = [composition, game_result]
+                      
+              if team_data:
+                  result[game_id] = team_data
+          game_list = list(result.keys())
+          query = """
+          SELECT M1.Champion
+              , M1.con_champ
+              , MAX(M1.BP) AS BP
+              , MAX(M1.Ban) AS Ban
+              , MAX(M1.Pick) AS Pick
+              , MAX(M1.total_WIN_rate) AS WIN_rate
+              , CASE WHEN MAX(M1.duo_score) = 0 THEN min(M1.duo_score) ELSE Max(M1.duo_score) end AS duo_score
+              , CASE WHEN MAX(M1.count_score) = 0 THEN Min(M1.count_score) ELSE max(M1.count_score) END AS count_score
+           FROM ( SELECT M.Champion
+                       , M.con_champ
+                       , M.Team_YN
+                       , M.BP
+                       , M.Ban
+                       , M.Pick
+                       , M.total_WIN_cnt
+                       , M.total_WIN_rate
+                       , M.duo_play_cnt
+                       , M.duo_WIN_cnt
+                       , M.duo_WIN_rate
+                       , CASE WHEN Team_YN = 'Y' THEN M.duo_WIN_rate - M.total_WIN_rate ELSE 0 END AS duo_score
+                       , CASE WHEN Team_YN = 'N' THEN M.duo_WIN_rate - M.total_WIN_rate ELSE 0 END AS count_score
+                    FROM ( SELECT T1.Champion
+                                , T2.con_champ
+                                , T2.Team_YN
+                                , T1.BP
+                                , T1.Ban
+                                , T1.Pick
+                                , COALESCE(T3.WIN_cnt,0) AS total_WIN_cnt
+                                , CASE WHEN T1.Pick = 0 THEN 0 ELSE ROUND(COALESCE(CAST(T3.WIN_cnt AS NUMERIC),0)/T1.Pick*100,2) END AS total_WIN_rate
+                                , COALESCE(T2.play_cnt,0) AS duo_play_cnt
+                                , COALESCE(T2.WIN_cnt,0) AS duo_WIN_cnt
+                                , CASE WHEN T2.play_cnt = 0 THEN 0 ELSE ROUND(COALESCE(CAST(T2.WIN_cnt AS NUMERIC),0)/COALESCE(T2.play_cnt,0)*100,2) END AS duo_WIN_rate
+                             FROM ( SELECT Champion
+                                         , count(Champion) AS BP
+                                         , SUM(CASE WHEN BP_DIV = 'Ban' THEN 1 ELSE 0 END) AS Ban
+                                         , SUM(CASE WHEN BP_DIV = 'Pick' THEN 1 ELSE 0 END) AS Pick
+                                      FROM ( SELECT 'Ban' AS BP_DIV
+                                                   , Ban AS Champion
+                                                FROM banpick.a_game_ban A
+                                                     INNER JOIN banpick.a_game B
+                                                  ON A.Game_ID = B.Game_ID
+                                               WHERE B.Ver like 'v15%'
+                                               UNION ALL
+                                              SELECT 'Pick' AS BP_DIV
+                                                   , Pick AS Champion
+                                                FROM banpick.a_game_ban A
+                                                     INNER JOIN banpick.a_game B
+                                                  ON A.Game_ID = B.Game_ID
+                                               WHERE B.Ver like 'v15%'
+                                           ) A
+                                     GROUP BY Champion
+                                  ) T1
+                                  LEFT OUTER JOIN
+                                  ( SELECT A.Champion AS stan_champ
+                                         , B.Champion AS con_champ
+                                         , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END AS Team_YN
+                                         , count(DISTINCT A.Game_ID) AS play_cnt
+                                         , count(DISTINCT CASE WHEN A.RESULT = 'WIN' THEN A.Game_ID ELSE NULL END) AS WIN_cnt
+                                      FROM ( SELECT A.Game_ID
+                                                  , A.Champion
+                                                  , A.Team_Div
+                                                  , CASE WHEN A.Team_Div = 'BLUE' THEN Blue_Result ELSE Red_Result END AS Result
+                                               FROM banpick.a_game_stat A
+                                                    INNER JOIN banpick.a_game B
+                                                 ON A.Game_ID = B.Game_ID
+                                              WHERE B.Ver like 'v15%'
+                                           ) A
+                                           LEFT OUTER JOIN
+                                           ( SELECT A.Game_ID
+                                                  , A.Champion
+                                                  , A.Team_Div
+                                                  , CASE WHEN A.Team_Div = 'BLUE' THEN Blue_Result ELSE Red_Result END AS Result
+                                               FROM banpick.a_game_stat A
+                                                    INNER JOIN banpick.a_game B
+                                                 ON A.Game_ID = B.Game_ID
+                                              WHERE B.Ver like 'v15%'
+                                           ) B
+                                        ON A.Game_ID = B.Game_ID
+                                       AND A.Champion != B.Champion
+                                     GROUP BY A.Champion
+                                         , B.Champion
+                                         , CASE WHEN A.Team_Div = B.Team_Div THEN 'Y' ELSE 'N' END
+                                  ) T2
+                               ON T1.Champion = T2.stan_Champ
+                                  LEFT OUTER JOIN
+                                  ( SELECT A.Champion
+                                         , sum(CASE WHEN A.Team_Div = 'BLUE' AND B.Blue_Result = 'WIN' THEN 1
+                                                    WHEN A.Team_Div = 'RED' AND B.Red_result = 'WIN' THEN 1 ELSE 0 END) AS WIN_cnt
+                                      FROM banpick.a_game_stat A
+                                           INNER JOIN banpick.a_game B
+                                        ON A.Game_ID = B.Game_ID
+                                     WHERE B.Ver like 'v15%'
+                                     GROUP BY A.Champion
+                                  ) T3
+                               ON T1.Champion = T3.Champion
+                         ) M
+                   WHERE 1=1
+                     /* AND duo_play_cnt > 2
+                     AND BP > 9 */
+                ) M1
+          GROUP BY M1.Champion
+               , M1.con_champ
+          """
+          df = pd.read_sql(query.replace('\n',' '), connection)
+          df['champion'] = df['champion'].str.lower()
+          df['con_champ'] = df['con_champ'].str.lower()
 
-game_list_df = pd.read_sql(game_list_query, conn)
+          query2="""SELECT B.Champion
+              , A.Gold_Data
+              , A.CS_Data
+           FROM banpick.a_game_timeline A
+                INNER JOIN banpick.a_game_stat B
+             ON A.game_ID = B.Game_ID
+            AND A.Team_Div = B.Team_Div
+            AND A.ROLE = B.Role
+            WHERE A.Game_ID IN (SELECT game_ID FROM banpick.a_game WHERE Ver like 'v15%') """
+          df2 = pd.read_sql(query2, connection)
+          df2['champion'] = df2['champion'].str.lower()
 
-conn.close()
-champion_list=game_list_df['Champion'].unique()
-cham_powergraph=[]
-for cham in champion_list:
-    df=game_list_df[game_list_df['Champion']==cham]
-    result=[]
-    for i in df['Gold_Data']:
-        data=eval(i)
-        temp_list=[]
-        for j in range(0,len(data)-1):
-            if j != 0:
-                temp_list.append(int(data[j])-int(data[j-1]))
-        result.append(temp_list)
-    power_graph=[]    
-    for k in range(0,30):
-        temp=[]
-        for u in result:
-            try:
-                temp.append(u[k])
-            except:
-                break
-        if len(temp) != 0:
-            value=round(sum(temp)/len(temp),2)
-        power_graph.append(value)
-    cham_powergraph.append([cham,power_graph])
-power_df=pd.DataFrame(cham_powergraph)
-power_df.columns=['Champion','Value']
-power_df.head()
-temp_data=power_df.head(10)
-data_list=[]
-for q in range(0,10):
-    temp_str=''
-    temp_str= temp_str+temp_data.iloc[q][0]+str(temp_data.iloc[q][1])
-    data_list.append(temp_str)
-data_list
-data_list=['Corki[0.17, 113.17, 321.74, 373.89, 348.87, 332.57, 389.24, 400.37, 315.28, 407.37, 406.22, 401.11, 427.13, 428.72, 389.96, 443.43, 494.61, 432.28, 458.15, 477.78, 417.37, 512.67, 378.48, 419.94, 431.52, 427.21, 383.56, 479.32, 287.87, 437.83]',
- 'Jayce[0.89, 80.0, 275.93, 335.13, 338.64, 316.0, 365.96, 346.16, 339.69, 366.89, 365.36, 380.6, 404.04, 432.73, 369.53, 446.78, 412.24, 423.27, 431.04, 442.11, 399.87, 425.47, 499.44, 382.62, 477.33, 336.67, 403.33, 381.0, 234.0, 278.0]',
- 'KSante[0.53, 71.37, 266.87, 324.21, 299.63, 321.26, 381.58, 332.97, 323.34, 385.29, 339.5, 376.71, 372.92, 364.58, 356.71, 394.79, 386.87, 384.63, 406.11, 354.5, 353.66, 357.05, 312.71, 314.97, 327.76, 398.71, 437.03, 419.42, 708.5, 273.0]',
- 'Leona[1.92, 56.53, 216.66, 220.13, 201.08, 202.82, 231.84, 207.82, 214.84, 252.32, 257.55, 266.0, 234.95, 235.26, 229.24, 274.32, 239.03, 237.21, 213.74, 214.21, 208.82, 235.68, 271.71, 239.32, 238.0, 200.0, 280.5, 187.5, 190.0, 82.0]',
- 'Miss Fortune[0.0, 98.53, 370.27, 343.0, 315.8, 343.6, 407.93, 370.2, 341.87, 441.27, 398.0, 407.67, 531.6, 509.87, 364.27, 400.33, 536.47, 463.93, 529.0, 477.53, 497.87, 407.27, 368.0, 397.87, 358.4, 484.93, 544.4, 433.27, 792.75, 5.0]',
- 'Rell[1.8, 57.88, 210.7, 222.56, 197.42, 210.78, 235.44, 225.68, 229.8, 222.4, 241.7, 246.08, 247.54, 252.14, 246.04, 258.16, 230.98, 229.94, 238.0, 226.4, 219.12, 242.22, 251.1, 247.74, 198.67, 329.0, 342.0, 385.0, 551.5, 87.5]',
- 'Sejuani[0.74, 122.82, 362.38, 387.59, 302.76, 297.68, 297.24, 361.15, 354.32, 307.91, 318.97, 322.59, 341.29, 322.44, 370.88, 329.26, 306.97, 371.41, 326.24, 328.59, 277.82, 301.74, 328.35, 300.32, 267.08, 371.88, 330.92, 315.28, 262.92, 175.25]',
- 'Skarner[3.0, 126.0, 359.8, 359.0, 323.2, 247.0, 401.6, 403.0, 289.4, 404.2, 271.0, 427.4, 321.0, 354.8, 504.6, 450.4, 479.4, 334.6, 390.8, 439.0, 325.0, 309.0, 295.0, 321.4, 346.0, 318.8, 724.8, 546.6, 667.0, 5.0]',
- 'Viktor[0.36, 154.54, 316.57, 360.25, 361.64, 314.39, 350.96, 354.14, 331.54, 396.43, 395.36, 373.79, 446.96, 379.0, 373.68, 422.75, 373.96, 448.96, 460.14, 357.18, 400.61, 379.25, 445.68, 345.04, 401.57, 537.04, 421.69, 398.81, 136.0, 259.5]',
- 'Yone[0.19, 118.65, 311.15, 371.31, 370.38, 298.92, 375.38, 370.19, 308.85, 396.46, 407.85, 403.31, 409.58, 371.65, 357.54, 426.58, 416.81, 440.88, 429.19, 437.92, 406.65, 354.31, 358.08, 367.33, 653.0, 370.0, 841.33, 446.67, 1052.67, 374.33]']
-import pandas as pd
-import plotly.express as px
-import plotly.graph_objects as go
+          query3="""
+          SELECT F.Champion
+              , F.avg_dpm * Ad_rate AS AD_p
+              , F.avg_dpm * AP_rate AS AP_p
+              , F.avg_dpm * TD_rate AS TD_p
+              , F.avg_dpm
+              , F.tank_death
+              , F.tank_time
+              , F.deal_death
+              , F.deal_time
+           FROM ( SELECT CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end AS Champion
+                       , round(avg(A.DPM),2) AS avg_dpm
+                       , round(SUM(A."Physical Damage") / SUM(A."Total damage to Champion"),2) AS AD_rate
+                       , round(SUM(A."Magic Damage") / SUM(A."Total damage to Champion") ,2) AS AP_rate
+                       , round(SUM(A."True Damage") / SUM(A."Total damage to Champion") ,2) AS TD_rate
+                       , SUM(CASE WHEN A.ROLE = 'JUNGLE' THEN A."Total damage taken" * 0.7 ELSE A."Total damage taken" END) / (SUM(A.Deaths) + count(A.Champion))  AS tank_death
+                       , avg(ROUND(CASE WHEN A.ROLE = 'JUNGLE' THEN A."Total damage taken" * 0.7 ELSE A."Total damage taken" END / ROUND((CAST(LEFT(B.Game_Time,2) AS NUMERIC)*60 + CAST(RIGHT(B.Game_Time,2) AS NUMERIC)) / 60,2))) AS tank_time
+                       , SUM(A."Total damage to Champion") / (SUM(A.Deaths) + count(A.Champion))  AS deal_death
+                       , round(avg(A.DPM),2) AS deal_time
+                    FROM banpick.a_game_stat A
+                         INNER JOIN banpick.a_game B
+                      ON A.Game_ID = B.Game_ID 
+                   WHERE B.Ver like 'v15%'
+                   GROUP BY CASE WHEN A.ROLE = 'SUPPORT' THEN concat(A.Champion,'_',A.ROLE) ELSE A.Champion end
+                ) F
 
-# 데이터를 DataFrame으로 변환
-# 주어진 데이터를 적절한 형태로 변환
-def create_dataframe(data_list):
-    champion_data = {}
-    for line in data_list:
-        # 챔피언 이름과 데이터 분리
-        champion_name = line.split('[')[0].strip()
-        # 문자열 데이터를 숫자 리스트로 변환
-        values = [float(x.strip()) for x in line.split('[')[1].strip(']').split(',')]
-        champion_data[champion_name] = values
-    
-    # DataFrame 생성을 위한 리스트 만들기
-    df_data = []
-    for champion, values in champion_data.items():
-        for time_point, value in enumerate(values):
-            df_data.append({
-                'Champion': champion,
-                'Time': time_point,
-                'Value': value
-            })
-    
-    return pd.DataFrame(df_data)
+          """
+          sql2 = """
+          SELECT A.Game_ID 
+              , B.Champion 
+              , B.Team_Div 
+              , B.Role
+              , A.Blue_Result 
+              , A.Red_Result 
+           FROM banpick.a_game A
+                INNER JOIN 
+                banpick.a_game_stat B
+             ON A.Game_ID = B.Game_ID 
+          WHERE A.Ver like 'v15%'
+          """
+          dmg_rate_df=pd.read_sql_query(query3,connection)
+          dmg_rate_df['champion'] = dmg_rate_df['champion'].str.lower()
+          avg_tank_death = dmg_rate_df['tank_death'].sum()/dmg_rate_df['tank_death'].count()
+          avg_tank_time = dmg_rate_df['tank_time'].sum()/dmg_rate_df['tank_time'].count()
+          dmg_rate_df['tank_death_norm']=dmg_rate_df['tank_death']/avg_tank_death
+          dmg_rate_df['tank_time_norm']=dmg_rate_df['tank_time']/avg_tank_time
+          dmg_rate_df['tank_norm_total'] = dmg_rate_df['tank_death_norm'] + dmg_rate_df['tank_time_norm']
+          avg_deal_death = dmg_rate_df['deal_death'].sum()/dmg_rate_df['deal_death'].count()
+          avg_deal_time = dmg_rate_df['deal_time'].sum()/dmg_rate_df['deal_time'].count()
+          dmg_rate_df['deal_death_norm']=dmg_rate_df['deal_death']/avg_deal_death
+          dmg_rate_df['deal_time_norm']=dmg_rate_df['deal_time']/avg_deal_time
+          dmg_rate_df['deal_norm_total'] = dmg_rate_df['deal_death_norm'] + dmg_rate_df['deal_time_norm']
+          dmg_rate_df['champion']=dmg_rate_df['champion'].str.lower()
 
-# 예시 데이터
-data_list = data_list
+          cham_powergraph=[]
+          champion_list=df2['champion'].unique()
+          for cham in champion_list:
+             gold_df=df2[df2['champion']==cham]
+             time_gold=[]
+             for i in gold_df['gold_data']:
+                 data=eval(i)
+                 temp_list=[]
+                 for j in range(0,len(data)-1):
+                     if j != 0:
+                         temp_list.append(int(data[j])-int(data[j-1]))
+                 time_gold.append(temp_list)
+             power_graph=[]
+             for k in range(0,30):
+                 temp=[]
+                 value=0
+                 for u in time_gold:
+                     try:
+                         temp.append(u[k])
+                     except:
+                         pass
+                 if len(temp) != 0:
+                     value=round(sum(temp)/len(temp),2)
+                 power_graph.append(value)
+             cham_powergraph.append([cham,power_graph])
+          power_df=pd.DataFrame(cham_powergraph)
+          power_df.columns = ['champion','gold_data']
 
-# DataFrame 생성
-df = create_dataframe(data_list)
-
-# Plotly를 사용한 라인 차트 생성
-fig = px.line(df, 
-              x='Time', 
-              y='Value', 
-              color='Champion',
-              title='Champion Performance Over Time',
-              labels={'Time': 'Time Point', 
-                     'Value': 'Performance Value',
-                     'Champion': 'Champion Name'},
-              markers=True)
-
-# 차트 레이아웃 커스터마이징
-fig.update_layout(
-    plot_bgcolor='white',
-    paper_bgcolor='white',
-    font=dict(size=12),
-    legend=dict(
-        yanchor="top",
-        y=0.99,
-        xanchor="left",
-        x=1.02
-    ),
-    hovermode='x unified'
-)
-
-# 축 스타일 설정
-fig.update_xaxes(
-    gridcolor='lightgrey',
-    zeroline=True,
-    zerolinewidth=1,
-    zerolinecolor='lightgrey'
-)
-fig.update_yaxes(
-    gridcolor='lightgrey',
-    zeroline=True,
-    zerolinewidth=1,
-    zerolinecolor='lightgrey'
-)
-
-# 차트 표시
-fig.show()
+          edu_ml=[]
+          for i in game_list:
+             sample_ml=[]
+             sample=''
+             blue_gold=utils.gold(result[i]['BLUE'][0],power_df)
+             red_gold=utils.gold(result[i]['RED'][0],power_df)
+             sample=pd.concat([blue_gold,red_gold],axis=1)
+             sample.columns=['Time','blue_gold','-','red_gold']
+             sample['diff_gold']=sample['blue_gold']-sample['red_gold']
+          #    sample_ml.append(round(sample[sample['Time']=='early']['diff_gold'].iloc[0],2))
+             sample_ml.append(round(sample[sample['Time']=='middle']['diff_gold'].iloc[0],2))
+             try:
+                 sample_ml.append(round(sample[sample['Time']=='late']['diff_gold'].iloc[0],2))
+             except:
+                 sample_ml.append(0)
+             edu_ml.append(sample_ml)
+          gold_ml_df=pd.DataFrame(edu_ml)
+          gold_ml_df.columns = ['middle_gold','late_gold']
+          gold_ml_df
