@@ -14,6 +14,10 @@ from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
 from .apps import MainappConfig 
 from . import utils
+from django.http import HttpResponse
+
+def health_check(request):
+    return HttpResponse("OK", status=200) 
 
 def get_replacements(sql4):
     with connection.cursor() as cursor:
