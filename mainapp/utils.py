@@ -10,6 +10,7 @@ import logging
 from sklearn.calibration import CalibratedClassifierCV
 from sklearn.model_selection import KFold
 from sklearn.metrics import accuracy_score, roc_auc_score
+import ast
 
 
 def process_teams(Blue_Team, Red_Team,df):
@@ -126,39 +127,48 @@ def process_teams(Blue_Team, Red_Team,df):
     features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
     return features
 
-def time_bucket(t):
-    if t<=10:
-        return 'early'
-    elif t<=20:
-        return 'middle'
-    else:
-        return 'late'
-        
-def gold(cham_list,power_df):
-    gold_result=[]
-    temp_2=[]
-    temp_3=[]
+def gold(cham_list, power_df):
+    temp_2 = []
+    temp_3 = []
     for i in cham_list:
-        i=i.lower()
-        if len(power_df[power_df['Champion']==i]['gold_data']) != 0:
-            temp_2.append(power_df[power_df['Champion']==i]['gold_data'].iloc[0])
-    for k in range(0,35):
-        temp=[]
-        value=0
+        i = i.lower()
+
+        try:
+            raw_data = power_df.loc[i, 'Gold_Data']
+            gold_list = ast.literal_eval(raw_data)
+            temp_2.append(gold_list)
+
+        except KeyError:
+            pass
+        except (ValueError, TypeError):
+            pass
+
+    for k in range(0, 35):
+        temp = []
+        value = 0
+
         for u in temp_2:
-            try:
+            if k < len(u):
                 temp.append(u[k])
-            except:
-                pass
         if len(temp) != 0:
-            value=round(sum(temp)/len(temp),2)
-        temp_3.append([k,value])
-    temp_gold_result=pd.DataFrame(temp_3)
-    temp_gold_result.columns=['time','gold']
-    temp_gold_result['TimeRange']=temp_gold_result['time'].apply(time_bucket)
+            value = round(sum(temp) / len(temp), 2)
+        temp_3.append([k, value])
+    bins = [0, 10, 20, 35]
+    labels = ['early', 'middle', 'late']
+    temp_gold_result = pd.DataFrame(temp_3)
+    temp_gold_result.columns = ['time', 'gold']
+    temp_gold_result['TimeRange'] = pd.cut(
+        temp_gold_result['time'],
+        bins=bins,
+        labels=labels,
+        right=False # 0~10미만, 10~20미만, 20~35미만
+    )
     temp_gold_result = temp_gold_result[~((temp_gold_result['TimeRange'] == 'late') & (temp_gold_result['gold'] == 0))]
     gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
     return gold_result
+
+
+
 
 
 def duo_chart(blue_team,df):
@@ -445,28 +455,28 @@ def dmg_weight(cham_list,dmg_rate_df):
     cham_list[-1]=cham_list[-1].replace('_support','')
     return dmg_weight
 
-    
+
 def dmg_weight_chart(dmg_weight):
     # 'Attack'이 'Defence' 위로 표시되도록 순서 조정
     attribute = ['Defence', 'Attack']
-    
+
     # 총합 계산
     total_attack = round(sum([item[1] for item in dmg_weight]),2)
     total_defence = round(sum([item[2] for item in dmg_weight]),2)
-    
+
     # 공격과 방어 데이터를 각각 [공격, 방어] 순으로 저장
     values = [[round(item[2], 1), round(item[1], 1)] for item in dmg_weight]
     ratios = [[round(item[2]/total_attack*100, 2), round(item[1]/total_defence*100, 2)] for item in dmg_weight]
-    
+
     # 'Attack'이 첫 번째, 'Defence'가 두 번째로 위치하도록 값 순서 재배열
     values = [[v[0], v[1]] for v in values]
     ratios = [[r[0], r[1]] for r in ratios]
-    
+
     # 포지션 및 색상 설정
     colors = ['#FF6F61', '#7DCEA0', '#5DADE2', '#AF7AC5', '#F4D03F']
-    
+
     fig = go.Figure()
-    
+
     # 스택형 바 차트 생성
     for i, (champ, color) in enumerate(zip(dmg_weight, colors)):
         fig.add_trace(go.Bar(
@@ -504,7 +514,7 @@ def dmg_weight_chart(dmg_weight):
             font=dict(color="white", size=14, family="Arial", weight="bold"),
             bgcolor="rgba(0, 0, 0, 0.5)",  # 배경 투명한 검은색으로 가독성 증가
         )
-    
+
     chart_code=(fig.to_html(
             full_html=False,
             include_plotlyjs='cdn',
@@ -515,7 +525,7 @@ def damage_distribution(champion_list,dmg_rate_df):
     # 챔피언 필터링
     champion_list[-1]=champion_list[-1]+'_support'
     selected_df = dmg_rate_df[dmg_rate_df['Champion'].isin(champion_list)]
-    
+
     # 총합 계산
     total_AD_p = selected_df['AD_p'].sum()
     total_AP_p = selected_df['AP_p'].sum()
@@ -533,7 +543,7 @@ def damage_distribution(champion_list,dmg_rate_df):
     values = [total_AD_p, total_AP_p, total_TD_p]
     labels = ['AD', 'AP', 'True Damage']
     colors = ['#FF6F61', '#5DADE2', '#F4D03F']  # AD(빨강), AP(파랑), TD(노랑)
-    
+
     # 파이 차트 생성
     fig = go.Figure(data=[go.Pie(
         labels=labels,
@@ -598,7 +608,7 @@ def ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df):
     test_df['gold']=gold_ml_df['middle_gold'] * gold_ml_df['late_gold']
     features=test_df
     return features
-  
+
 def dmg_weight_chart_comment(blue_team,red_team,gold_ml_df,df,dmg_rate_df):
     comment_code=''
     # 1 <- 변경예정
