@@ -1,7 +1,6 @@
 # mainapp/apps.py
 
 from django.apps import AppConfig
-from django.db import connection
 import pandas as pd
 import numpy as np
 import logging
@@ -21,31 +20,43 @@ class MainappConfig(AppConfig):
     name = 'mainapp'
     # 데이터프레임을 저장할 전역 변수를 MainappConfig 클래스 레벨에서 정의
     # (views.py에서도 이 변수를 import하여 사용하게 됩니다.)
-    global_df = {} 
+    global_df = {}
+    ml_model = None
 
-    
-    def ready(self):        
+    def ready(self):
         # 서버 시작 시 딱 한 번만 실행됩니다.
         logger.info("Starting data pre-loading for mainapp...")
+        logger.warning("---  App Ready Function Started ---")
 
         try:
 
           DATA_DIR = os.path.join(settings.BASE_DIR, 'data')
-        
+          logger.warning("---  Starting to load df.csv ---")
           global df
           df = pd.read_csv(os.path.join(DATA_DIR, 'df.csv'))
-          
+          logger.warning("---  df.csv Loaded Successfully ---")
+
+          logger.warning("---  Starting to load dmg_rate_df.csv ---")
           global dmg_rate_df
           dmg_rate_df = pd.read_csv(os.path.join(DATA_DIR, 'dmg_rate_df.csv'))
-          
+          logger.warning("---  dmg_rate_df.csv Loaded Successfully ---")
+
+          logger.warning("---  Starting to load gold_ml_df.csv ---")
           global gold_ml_df
           gold_ml_df = pd.read_csv(os.path.join(DATA_DIR, 'gold_ml_df.csv'))
-          
+          logger.warning("---  gold_ml_df.csv Loaded Successfully ---")
+
+          logger.warning("---  Starting to load power_df.csv ---")
           global power_df
           power_df = pd.read_csv(os.path.join(DATA_DIR, 'power_df.csv'))
-            
+          logger.warning("---  power_df.csv Loaded Successfully ---")
+          power_df.columns = power_df.columns.str.strip()
+          power_df.set_index('Champion', inplace=True)
+
+          logger.warning("---  Starting to load result.pkl ---")
           global result
           result = joblib.load(os.path.join(DATA_DIR, 'result.pkl'))
+          logger.warning("---  result.pkl Loaded Successfully ---")
           game_list = list(result.keys())
 
           ml_df=[]
@@ -55,7 +66,7 @@ class MainappConfig(AppConfig):
                  ml_game_result=[1]
              else:
                  ml_game_result=[0]
-             ml_temp_df2=pd.DataFrame(ml_game_result)    
+             ml_temp_df2=pd.DataFrame(ml_game_result)
              ml_temp_df2.columns=['game_result']
              ml_temp_df3=pd.concat([ml_temp_df,ml_temp_df2],axis=1)
              if len(ml_df)==0:
@@ -90,19 +101,17 @@ class MainappConfig(AppConfig):
           for train_idx, val_idx in kf.split(X):
              X_train, X_val = X.iloc[train_idx], X.iloc[val_idx]
              y_train, y_val = y.iloc[train_idx], y.iloc[val_idx]
-             
+
              model = xgb.XGBClassifier(n_estimators=200)
              calibrated_model = CalibratedClassifierCV(model, method='isotonic', cv=5)
-             calibrated_model.fit(X_train, y_train,
-                       eval_set=[(X_val, y_val)],
-                       verbose=False)
-               
+             calibrated_model.fit(X_train, y_train)
+
              y_pred = calibrated_model.predict(X_val)
              y_pred_prob = calibrated_model.predict_proba(X_val)[:, 1]
-             
+
              acc = accuracy_score(y_val, y_pred)
              auc = roc_auc_score(y_val, y_pred_prob)
-             
+
              print(f"Fold {fold} | Accuracy: {acc:.4f} | AUC: {auc:.4f}")
              acc_scores.append(acc)
              auc_scores.append(auc)
@@ -111,17 +120,17 @@ class MainappConfig(AppConfig):
           print("\n==== 최종 평균 성능 ====")
           print(f"Average Accuracy: {np.mean(acc_scores):.4f}")
           print(f"Average AUC: {np.mean(auc_scores):.4f}")
+          global final_model
           final_model = xgb.XGBClassifier(n_estimators=100, **params)
           final_model.fit(X, y)
-            
+
             # 최종 결과 저장 (예시)
           MainappConfig.global_df['df'] = df
-          MainappConfig.global_df['df2'] = df2
           MainappConfig.global_df['dmg_rate_df'] = dmg_rate_df
           MainappConfig.global_df['power_df'] = power_df
           MainappConfig.global_df['gold_ml_df'] = gold_ml_df
+          MainappConfig.ml_model = final_model
 
-            
           logger.info("Data pre-loading complete and cached.")
 
         except Exception as e:
