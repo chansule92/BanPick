@@ -15,13 +15,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', mysettings.SECRET_KEY)
 #DATABASES = mysettings.DATABASES
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
-    # Render 환경일 경우, DATABASE_URL을 파싱하여 DATABASES 설정에 적용합니다.
-    """DATABASES = {
+    DATABASES = {
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
-    }"""
+    }
 else:
-    # 로컬 환경이나 DATABASE_URL이 설정되지 않은 경우, 기존 설정을 사용합니다.
     DATABASES = mysettings.DATABASES
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
