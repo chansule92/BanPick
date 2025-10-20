@@ -20,7 +20,6 @@ COPY . .
 
 RUN python manage.py collectstatic --no-input
 
-ENV PORT 8000
-EXPOSE 8000
-
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "config.wsgi:application", "--timeout", "300"]
+ENV PORT 8080
+EXPOSE 8080
+CMD ["gunicorn", "--bind", "0.0.0.0:8080", "config.wsgi:application", "--timeout", "600"]
