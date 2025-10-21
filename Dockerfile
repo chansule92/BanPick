@@ -31,5 +31,4 @@ EXPOSE 8080
 # 🚨 6. CMD 변경: Nginx와 Gunicorn을 유니콘 소켓으로 연결하여 동시에 실행 🚨
 # Nginx를 백그라운드에서 실행하고, Gunicorn을 소켓에 바인딩합니다.
 CMD service nginx start && \
-    gunicorn --bind unix:/tmp/gunicorn.sock config.wsgi:application --workers 1 --timeout 300 \
-    --umask 007 --group 0
+    gunicorn --bind unix:/tmp/gunicorn.sock config.wsgi:application --workers 1 --timeout 300
