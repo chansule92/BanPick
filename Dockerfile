@@ -1,38 +1,44 @@
-FROM python:3.11-slim
+# ------------------------------------
+# 1단계: 빌드 스테이지 (Build Stage) - WhiteNoise를 사용하여 정적 파일 수집
+# ------------------------------------
+FROM python:3.11-slim AS builder
+
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
 
 WORKDIR /usr/src/app
 
-# 🚨 1. 모든 시스템 라이브러리를 한 번에 설치합니다. 🚨
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc \
-    default-libmysqlclient-dev \
-    pkg-config \
-    nginx \
-    # 🚨 NGINX 기본 설정 파일 삭제: Welcome to Nginx! 페이지를 띄우는 설정입니다.
-    # 이 파일을 삭제해야 사용자 설정이 적용됩니다.
-    && rm -f /etc/nginx/sites-enabled/default \
-    && rm -rf /var/lib/apt/lists/*
+# requirements.txt에 gunicorn, django, **whitenoise** 가 포함되어 있어야 합니다.
+COPY requirements.txt .
+RUN pip install --upgrade pip && pip install -r requirements.txt --no-cache-dir
 
-# 2. Python 의존성 설치
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
-
-# 3. 코드 복사 및 Nginx 설정 파일 복사
 COPY . .
-# 사용자님의 nginx.conf 파일을 NGINX가 읽는 정확한 위치에 복사합니다.
-# 🚨🚨 경로 수정: nginx.conf 파일이 config/ 폴더 안에 있다고 가정하고 수정 🚨🚨
-COPY config/nginx.conf /etc/nginx/conf.d/default.conf
 
-# 4. 정적 파일 수집 및 Nginx 경로 생성
-# 🚨 정적 파일 경로 통일: static_root 대신 static 사용
-RUN mkdir -p /usr/src/app/static/
-# collectstatic이 파일을 /usr/src/app/static 에 저장합니다.
-RUN python manage.py collectstatic --no-input
+# 정적 파일 수집
+RUN python manage.py collectstatic --noinput
 
-# 5. 포트 노출
-EXPOSE 8080
+# ------------------------------------
+# 2단계: 최종 서비스 스테이지 (Final Service Stage)
+# ------------------------------------
+FROM python:3.11-slim
 
-# 🚨 6. CMD: Nginx와 Gunicorn을 유니콘 소켓으로 연결하여 동시에 실행 🚨
-# 권한 안정화를 위해 --group www-data 사용
-CMD service nginx start && \
-    gunicorn --bind unix:/tmp/gunicorn.sock config.wsgi:application --workers 1 --timeout 300 --umask 007 --group www-data
+ENV PYTHONUNBUFFERED 1
+
+WORKDIR /usr/src/app
+
+# 1단계에서 설치된 종속성과 코드를 복사합니다.
+COPY --from=builder /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
+COPY --from=builder /usr/src/app /usr/src/app
+
+# Render는 환경 변수 $PORT를 사용합니다.
+# 이 포트를 Gunicorn이 리스닝하도록 설정합니다.
+ARG PORT=8000
+ENV PORT=${PORT}
+EXPOSE ${PORT}
+
+# start.sh 파일 복사 및 실행 권한 부여
+COPY start.sh /start.sh
+RUN chmod +x /start.sh
+
+# 컨테이너 시작 명령
+CMD ["/start.sh"]
