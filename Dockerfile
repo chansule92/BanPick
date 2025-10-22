@@ -20,7 +20,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 # 3. 코드 복사 및 Nginx 설정 파일 복사
 COPY . .
 # 사용자님의 nginx.conf 파일을 NGINX가 읽는 정확한 위치에 복사합니다.
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# 🚨🚨 경로 수정: nginx.conf 파일이 config/ 폴더 안에 있다고 가정하고 수정 🚨🚨
+COPY config/nginx.conf /etc/nginx/conf.d/default.conf
 
 # 4. 정적 파일 수집 및 Nginx 경로 생성
 # 🚨 정적 파일 경로 통일: static_root 대신 static 사용
