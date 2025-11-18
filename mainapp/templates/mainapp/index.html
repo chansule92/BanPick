@@ -396,22 +396,37 @@
             closeAllDropdowns();
         }
 
-        function submitForm() {
+        function updateChampionInputsAndStorage() {
             const championImages = document.querySelectorAll('td[id^="championImage"] img');
             championImages.forEach(function(image) {
                 const championName = image.src.split('/').pop().split('.')[0];
                 const inputId = image.parentElement.id.replace('championImage', 'championInput');
                 const input = document.getElementById(inputId);
-                input.value = championName;
+                input.value = championName; // 폼의 hidden input 값 업데이트
+        
+                // 로컬 스토리지 업데이트
+                localStorage.setItem(input.id, championName);
             });
+            // 데이터 준비가 완료되었으므로, 제출 버튼을 활성화할 수 있습니다 (필요하다면)
+            document.querySelector(".submit-button").disabled = false;
+        }
 
-            const championInputs = document.querySelectorAll('input[id^="championInput"]');
-            championInputs.forEach(function(input) {
-                localStorage.setItem(input.id, input.value);
-            });
 
+        function submitForm() {
+            // 💡 데이터 업데이트를 먼저 수행합니다.
+            // (선택 사항: 챔피언 선택이 변경될 때마다 updateChampionInputsAndStorage()가 실행되도록 설정했다면 생략 가능)
+            // updateChampionInputsAndStorage(); 
+        
+            // 1. 로컬 스토리지 길이 확인 (유효성 검사)
+            if (localStorage.length <= 9) {
+                document.querySelector(".submit-button").disabled = true;
+                alert("최소 10개 이상의 챔피언 정보가 필요합니다."); // 사용자에게 안내
+                return false; // 제출 중단
+            }
+        
+            // 2. 제출 버튼 비활성화 (중복 제출 방지)
             document.querySelector(".submit-button").disabled = true;
-            return true;
+            return true; // 제출 진행
         }
 
 
