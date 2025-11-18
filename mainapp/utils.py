@@ -4,127 +4,84 @@ import numpy as np
 import random
 import plotly.express as px
 from collections import defaultdict
-import json
-import xgboost as xgb
-import logging
-from sklearn.calibration import CalibratedClassifierCV
-from sklearn.model_selection import KFold
-from sklearn.metrics import accuracy_score, roc_auc_score
 import ast
 
 
-def process_teams(Blue_Team, Red_Team,df):
-    blue_temp_list=[]
-    for k in Blue_Team:
-        k=k.lower()
-        try:
-            Ban=max(df[df['Champion']==k]['Ban'])
-        except ValueError:
-            Ban=0
-        try:
-            Pick=max(df[df['Champion']==k]['Pick'])
-        except ValueError:
-            Pick=0
-        try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
-        except ValueError:
-            Win_rate=50
-        duo_score=0
-        count_score=0
-        for i in Blue_Team:
-            i=i.lower()
-            if k==i:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        duo_score = duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
-                    except IndexError:
-                        duo_score = 0
-        for j in Red_Team:
-            j=j.lower()
-            if k==j:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        count_score = count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
-                    except IndexError:
-                        count_score = 0
-        blue_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
-    #blue_temp_list=[0 if pd.isna(x) else x for x in blue_temp_list]
-    sum1=0
-    sum2=0
-    sum3=0
-    sum4=0
-    sum5=0
-    for i in blue_temp_list:
-        sum1+=i[0]
-        sum2+=i[1]
-        sum3+=i[2]
-        sum4+=i[3]
-        sum5+=i[4]
-    red_temp_list=[]
-    for k in Red_Team:
-        k=k.lower()
-        try:
-            Ban=max(df[df['Champion']==k]['Ban'])
-        except ValueError:
-            Ban=0
-        try:
-            Pick=max(df[df['Champion']==k]['Pick'])
-        except ValueError:
-            Pick=0
-        try:
-            Win_rate=max(df[df['Champion']==k]['Win_rate'])
-        except ValueError:
-            Win_rate=50
-        duo_score=0
-        count_score=0
-        for i in Red_Team:
-            i=i.lower()
-            if k==i:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        duo_score = duo_score + float(df[(df['Champion']==k)&(df['con_champ']==i)]['Duo_Score'].iloc[0])
-                    except IndexError:
-                        duo_score = 0
-        for j in Blue_Team:
-            j=j.lower()
-            if k==j:
-                pass
-            else :
-                if len(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score']) == 0:
-                    pass
-                else:
-                    try:
-                        count_score = count_score+ float(df[(df['Champion']==k)&(df['con_champ']==j)]['Count_Score'].iloc[0])
-                    except IndexError:
-                        count_score = 0
-        red_temp_list.append([Ban,Pick,Win_rate,round(duo_score,2),round(count_score,2)])
-    sum6=0
-    sum7=0
-    sum8=0
-    sum9=0
-    sum10=0
-    for i in red_temp_list:
-        sum6+=i[0]
-        sum7+=i[1]
-        sum8+=i[2]
-        sum9+=i[3]
-        sum10+=i[4]
-    result = [[sum3,sum4,sum5,sum8,sum9,sum10]]
-    result
-    features=pd.DataFrame(result)
-    features.columns=['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
+def process_teams(Blue_Team, Red_Team, df):
+    df['Champion'] = df['Champion'].str.lower()
+    df['con_champ'] = df['con_champ'].str.lower()
+
+    blue_champs = [k.lower() for k in Blue_Team]
+    red_champs = [k.lower() for k in Red_Team]
+
+    # 2. 기본 스탯 (Ban, Pick, Win_rate) 계산
+    # Blue Team의 기본 스탯을 데이터프레임으로 추출
+    blue_base_stats = df[df['Champion'].isin(blue_champs)][['Champion', 'Ban', 'Pick', 'Win_rate']].drop_duplicates()
+
+    # Red Team의 기본 스탯을 데이터프레임으로 추출
+    red_base_stats = df[df['Champion'].isin(red_champs)][['Champion', 'Ban', 'Pick', 'Win_rate']].drop_duplicates()
+
+
+    # Blue Team: Duo_Score 계산
+    blue_duo_df = df[df['Champion'].isin(blue_champs) & df['con_champ'].isin(blue_champs) & (df['Champion'] != df['con_champ'])]
+    blue_duo_score = blue_duo_df.groupby('Champion')['Duo_Score'].sum().rename('Blue_Duoscore')
+
+    # Blue Team: Count_Score (Red Team과의 카운터) 계산
+    blue_count_df = df[df['Champion'].isin(blue_champs) & df['con_champ'].isin(red_champs)]
+    blue_count_score = blue_count_df.groupby('Champion')['Count_Score'].sum().rename('Blue_Countscore')
+
+    # Red Team: Duo_Score 계산
+    red_duo_df = df[df['Champion'].isin(red_champs) & df['con_champ'].isin(red_champs) & (df['Champion'] != df['con_champ'])]
+    red_duo_score = red_duo_df.groupby('Champion')['Duo_Score'].sum().rename('Red_Duoscore')
+
+    # Red Team: Count_Score (Blue Team과의 카운터) 계산
+    red_count_df = df[df['Champion'].isin(red_champs) & df['con_champ'].isin(blue_champs)]
+    red_count_score = red_count_df.groupby('Champion')['Count_Score'].sum().rename('Red_Countscore')
+
+    # 4. 결과 집계 및 통합 (NaN 값 처리)
+
+    # Blue Team 최종 집계
+    blue_summary = blue_base_stats.set_index('Champion')
+    blue_summary = blue_summary.merge(blue_duo_score, left_index=True, right_index=True, how='left')
+    blue_summary = blue_summary.merge(blue_count_score, left_index=True, right_index=True, how='left')
+
+    # NaN 값 처리: Win_rate는 기본값 50, 나머지는 0 (원본 로직 반영)
+    blue_summary['Win_rate'] = blue_summary['Win_rate'].fillna(50)
+    blue_summary[['Ban', 'Pick', 'Blue_Duoscore', 'Blue_Countscore']] = \
+        blue_summary[['Ban', 'Pick', 'Blue_Duoscore', 'Blue_Countscore']].fillna(0)
+
+    # Red Team 최종 집계
+    red_summary = red_base_stats.set_index('Champion')
+    red_summary = red_summary.merge(red_duo_score, left_index=True, right_index=True, how='left')
+    red_summary = red_summary.merge(red_count_score, left_index=True, right_index=True, how='left')
+
+    # NaN 값 처리: Win_rate는 기본값 50, 나머지는 0 (원본 로직 반영)
+    red_summary['Win_rate'] = red_summary['Win_rate'].fillna(50)
+    red_summary[['Ban', 'Pick', 'Red_Duoscore', 'Red_Countscore']] = \
+        red_summary[['Ban', 'Pick', 'Red_Duoscore', 'Red_Countscore']].fillna(0)
+
+    # 5. 최종 합산 및 반환
+    # Blue Team
+    sum3 = blue_summary['Win_rate'].sum()
+    sum4 = blue_summary['Blue_Duoscore'].sum()
+    sum5 = blue_summary['Blue_Countscore'].sum()
+
+    # Red Team
+    sum8 = red_summary['Win_rate'].sum()
+    sum9 = red_summary['Red_Duoscore'].sum()
+    sum10 = red_summary['Red_Countscore'].sum()
+
+    # 결과 데이터프레임 생성
+    result = [[sum3, sum4, sum5, sum8, sum9, sum10]]
+    features = pd.DataFrame(result)
+    features.columns = ['Blue_Winrate','Blue_Duoscore','Blue_Countscore','Red_Winrate','Red_Duoscore','Red_Countscore']
+
+    # Duo_Score와 Count_Score는 소수점 둘째 자리까지 반올림 (원본 로직 반영)
+    features['Blue_Duoscore'] = features['Blue_Duoscore'].round(2)
+    features['Blue_Countscore'] = features['Blue_Countscore'].round(2)
+    features['Red_Duoscore'] = features['Red_Duoscore'].round(2)
+    features['Red_Countscore'] = features['Red_Countscore'].round(2)
+
     return features
 
 def gold(cham_list, power_df):
@@ -263,7 +220,7 @@ def duo_chart(blue_team,df):
     temp_chart_code.append(fig.to_html(
         full_html=False,
         include_plotlyjs='cdn',
-        div_id=f'THIS_IS_FIGID'+str(random.random())
+        div_id=f'THIS_IS_FIGID{random.random()}'
     ))
     return [temp_chart_code[0],synergy]
 
@@ -346,7 +303,7 @@ def count_chart(blue_team,red_team,df):
     temp_chart_code.append(fig.to_html(
         full_html=False,
         include_plotlyjs='cdn',
-        div_id=f'THIS_IS_FIGID'+str(random.random())
+        div_id=f'THIS_IS_FIGID{random.random()}'
     ))
     return [temp_chart_code[0],synergy_list]
 
@@ -356,7 +313,7 @@ def count_carry_lines(dmg_ratios):
 def count_tank_lines(dmg_ratios):
     return sum([1 for d in dmg_ratios if d >= 0.18])
 
-
+"""
 def power_graph(Cham_list,power_df):
     powerdata_list=[]
     for i in Cham_list:
@@ -365,6 +322,20 @@ def power_graph(Cham_list,power_df):
             temp_str=temp_str+power_df[power_df['Champion']==i].iloc[0][0]+str(power_df[power_df['Champion']==i].iloc[0][1])
             powerdata_list.append(temp_str)
     return powerdata_list
+"""
+
+def power_graph(Cham_list, power_df):
+    powerdata_list = []
+    for i in Cham_list:
+        if i in power_df.index:
+            temp_str = ''
+            gold_data_str = str(power_df.loc[i, power_df.columns[0]])
+            temp_str = temp_str + i + gold_data_str
+            powerdata_list.append(temp_str)
+
+    return powerdata_list
+
+
 
 def create_dataframe(data_list):
     champion_data = {}
@@ -435,10 +406,11 @@ def create_power_graph(power_data):
     chart_code = fig.to_html(
         full_html=False,
         include_plotlyjs='cdn',
-        div_id='THIS_IS_FIGID'+str(random.random())
+        div_id=f'THIS_IS_FIGID{random.random()}'
     )
     return chart_code
 
+"""
 def dmg_weight(cham_list,dmg_rate_df):
     dmg_weight = []
     cham_list[-1]=cham_list[-1]+'_support'
@@ -454,30 +426,45 @@ def dmg_weight(cham_list,dmg_rate_df):
         dmg_weight.append([champ_name, deal_norm_total, tank_norm_total])
     cham_list[-1]=cham_list[-1].replace('_support','')
     return dmg_weight
+"""
+
+def dmg_weight(cham_list, dmg_rate_dict):
+    dmg_weight = []
+
+    current_cham_list = [c.lower() for c in cham_list]
+    if current_cham_list and len(current_cham_list) == 5:
+        current_cham_list[-1] = current_cham_list[-1] + '_support'
+
+    for i in current_cham_list:
+        champ_name_key = i
+        stats = dmg_rate_dict.get(champ_name_key)
+
+        if stats:
+            deal_norm_total = stats[0]
+            tank_norm_total = stats[1]
+        else:
+            deal_norm_total = 0
+            tank_norm_total = 0
+        champ_display_name = i.replace('_support', '')
+        dmg_weight.append([champ_display_name, deal_norm_total, tank_norm_total])
+    return dmg_weight
 
 
 def dmg_weight_chart(dmg_weight):
-    # 'Attack'이 'Defence' 위로 표시되도록 순서 조정
     attribute = ['Defence', 'Attack']
 
-    # 총합 계산
     total_attack = round(sum([item[1] for item in dmg_weight]),2)
     total_defence = round(sum([item[2] for item in dmg_weight]),2)
 
-    # 공격과 방어 데이터를 각각 [공격, 방어] 순으로 저장
     values = [[round(item[2], 1), round(item[1], 1)] for item in dmg_weight]
     ratios = [[round(item[2]/total_attack*100, 2), round(item[1]/total_defence*100, 2)] for item in dmg_weight]
 
-    # 'Attack'이 첫 번째, 'Defence'가 두 번째로 위치하도록 값 순서 재배열
     values = [[v[0], v[1]] for v in values]
     ratios = [[r[0], r[1]] for r in ratios]
 
-    # 포지션 및 색상 설정
     colors = ['#FF6F61', '#7DCEA0', '#5DADE2', '#AF7AC5', '#F4D03F']
 
     fig = go.Figure()
-
-    # 스택형 바 차트 생성
     for i, (champ, color) in enumerate(zip(dmg_weight, colors)):
         fig.add_trace(go.Bar(
             y=attribute,
@@ -493,7 +480,6 @@ def dmg_weight_chart(dmg_weight):
             insidetextanchor='middle'
         ))
     max_value = max(total_attack, total_defence)
-    # 레이아웃 설정
     fig.update_layout(
         barmode='stack',
         title='Team Deal & Tank ratio',
@@ -501,32 +487,30 @@ def dmg_weight_chart(dmg_weight):
         plot_bgcolor='#0a0e21',
         paper_bgcolor='#0a0e21',
         font=dict(color='white'),
-        showlegend=False,  # 범례 숨김
+        showlegend=False,
         height=400
     )
-    for i, attr in enumerate(attribute):  # Attack / Defence 각각 처리
+    for i, attr in enumerate(attribute):
         total_value = total_attack if attr == 'Attack' else total_defence
         fig.add_annotation(
-            x=max_value * 1.02,  # 바 끝보다 살짝 오른쪽
-            y=i+0.3,  # 해당 바의 y 위치
-            text=f"Total: {total_value}",  # 표시할 텍스트
-            showarrow=False,  # 화살표 제거
-            font=dict(color="white", size=14, family="Arial", weight="bold"),
-            bgcolor="rgba(0, 0, 0, 0.5)",  # 배경 투명한 검은색으로 가독성 증가
+            x=max_value * 1.02,
+            y=i+0.3,
+            text=f"<b>Total: {total_value}</b>",
+            showarrow=False,
+            font=dict(color="white", size=14, family="Arial"),
+            bgcolor="rgba(0, 0, 0, 0.5)",
         )
 
     chart_code=(fig.to_html(
             full_html=False,
             include_plotlyjs='cdn',
-            div_id='THIS_IS_FIGID'+str(random.random())))
+            div_id=f'THIS_IS_FIGID{random.random()}'))
     return chart_code
 
 def damage_distribution(champion_list,dmg_rate_df):
-    # 챔피언 필터링
     champion_list[-1]=champion_list[-1]+'_support'
     selected_df = dmg_rate_df[dmg_rate_df['Champion'].isin(champion_list)]
 
-    # 총합 계산
     total_AD_p = selected_df['AD_p'].sum()
     total_AP_p = selected_df['AP_p'].sum()
     total_TD_p = selected_df['TD_p'].sum()
@@ -544,7 +528,6 @@ def damage_distribution(champion_list,dmg_rate_df):
     labels = ['AD', 'AP', 'True Damage']
     colors = ['#FF6F61', '#5DADE2', '#F4D03F']  # AD(빨강), AP(파랑), TD(노랑)
 
-    # 파이 차트 생성
     fig = go.Figure(data=[go.Pie(
         labels=labels,
         values=values,
@@ -553,21 +536,20 @@ def damage_distribution(champion_list,dmg_rate_df):
         marker=dict(colors=colors)
     )])
 
-    # 레이아웃 설정
     fig.update_layout(
         title="Damage Type Distribution",
         plot_bgcolor='#0a0e21',
         paper_bgcolor='#0a0e21',
         font=dict(color='white'),
         showlegend=False,
-        width=500,  # 너비 조절
-        height=400  # 높이 조절
+        width=500,
+        height=400
     )
 
     chart_code=(fig.to_html(
             full_html=False,
             include_plotlyjs='cdn',
-            div_id='THIS_IS_FIGID'+str(random.random())))
+            div_id=f'THIS_IS_FIGID{random.random()}'))
     return [chart_code,comment]
 
 
@@ -607,6 +589,7 @@ def ml_features(blue_team,red_team,gold_ml_df,df, dmg_rate_df):
     test_df['def_cnt']=ml_df['blue_def_cnt']-ml_df['red_def_cnt']
     test_df['gold']=gold_ml_df['middle_gold'] * gold_ml_df['late_gold']
     features=test_df
+    print(f"ML Features calculation finished. Feature shape: {features.shape}. Features: {features.iloc[0].tolist()}")
     return features
 
 def dmg_weight_chart_comment(blue_team,red_team,gold_ml_df,df,dmg_rate_df):
