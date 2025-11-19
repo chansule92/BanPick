@@ -34,7 +34,7 @@ DEBUG = False
 #]
 ALLOWED_HOSTS = [
     '*',
-    '.onrender.com', 
+    'banpick.onrender.com', 
     '127.0.0.1' 
 ]
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
