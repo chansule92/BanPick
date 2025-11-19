@@ -11,7 +11,7 @@ DATABASES = {
         'USER': 'banpick_postgresql_user',  
         'PASSWORD': 'WL9YPmomzpLbwuvgP8lbs9imR55Zb6q2', 
         # (Render 내부 네트워크 통신용 주소)
-        'HOST': 'postgresql://banpick_postgresql_user:WL9YPmomzpLbwuvgP8lbs9imR55Zb6q2@dpg-d4emop0gjchc73fka7gg-a/banpick_postgresql', 
+        'HOST': 'dpg-d4emop0gjchc73fka7gg-a.oregon-postgres.render.com', 
         'PORT': '5432',  
     }
 }
