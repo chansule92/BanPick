@@ -10,7 +10,7 @@ def health_check(request):
 
 
 def index(request):
-    student_information = champion_index.objects.values('EN', 'KR')
+    student_information = champion_index.objects.values('en', 'kr')
     pick = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
     blue_team = []
     red_team = []
