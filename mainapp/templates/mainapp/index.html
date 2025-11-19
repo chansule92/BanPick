@@ -230,7 +230,7 @@
                 <input type="text" class="search-input" onkeyup="searchFunction(event,{{j}})" onclick="stopPropagation(event)" placeholder="검색하기">
             </div>
             {% for i in student_information %}
-            <a href="#" id="championImage{{j}}_anchor" onclick="changeChampionImage('{{ i.EN }}', 'championImage{{j}}')">{{ i.KR }}</a>
+            <a href="#" id="championImage{{j}}_anchor" onclick="changeChampionImage('{{ i.en }}', 'championImage{{j}}')">{{ i.kr }}</a>
             {% endfor %}
         </div>
         {% endfor %}
