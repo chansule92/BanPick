@@ -1,12 +1,14 @@
 # 현재 데이터베이스의 값을 입력한다.
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'loldb',
-        'USER': 'root',
-        'PASSWORD': 'glemfk12',
-        'HOST': 'localhost',
-        'PORT': 3306
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db-sqlite3'
+#        'ENGINE': 'django.db.backends.mysql',
+#        'NAME': 'loldb',
+#        'USER': 'root',
+#        'PASSWORD': 'glemfk12',
+#        'HOST': 'localhost',
+#        'PORT': 3306
     }
 }
 
