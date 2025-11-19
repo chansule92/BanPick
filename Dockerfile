@@ -6,10 +6,11 @@ ENV PYTHONUNBUFFERED 1
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        libpq-dev \
+        pkg-config \
         default-libmysqlclient-dev \
+        libpq-dev \
         build-essential \
+        postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
 COPY requirements.txt .
