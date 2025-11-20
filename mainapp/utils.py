@@ -121,7 +121,7 @@ def gold(cham_list, power_df):
         right=False # 0~10미만, 10~20미만, 20~35미만
     )
     temp_gold_result = temp_gold_result[~((temp_gold_result['TimeRange'] == 'late') & (temp_gold_result['gold'] == 0))]
-    gold_result = temp_gold_result.groupby('TimeRange')['gold'].mean().reset_index()
+    gold_result = temp_gold_result.groupby('TimeRange',observed=False)['gold'].mean().reset_index()
     return gold_result
 
 
