@@ -30,6 +30,7 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
 
 
 ## ✨ 사용 방법
+- 분석시스템 URL (https://banpick.onrender.com/mainapp/)
 
 ### 1. 챔피언 선택
 <img width="872" height="559" alt="image" src="https://github.com/user-attachments/assets/d51132b8-931e-47eb-8482-985b27eea673" />
@@ -42,7 +43,6 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
   - **승부 예측 확률**: 블루팀 vs 레드팀 승률
   - **개별 챔피언 통계**: 각 챔피언의 픽률, 밴률, 승률
   - **10개 분석 차트**: 팀별 상세 분석 결과
-- 분석시스템 웹서비스 중 (https://banpick.onrender.com/mainapp/)
 - 해당 결과 블로그에 업로드중 (https://hj-jeong.tistory.com/)
 
 ### 3. 차트 해석 가이드
