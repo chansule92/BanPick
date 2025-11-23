@@ -32,9 +32,9 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
 ## ✨ 사용 방법
 
 ### 1. 챔피언 선택
-![README(1)](https://github.com/user-attachments/assets/b46b0a00-86a1-412b-99f6-628917ea76d1)
+<img width="872" height="559" alt="image" src="https://github.com/user-attachments/assets/d51132b8-931e-47eb-8482-985b27eea673" />
 
-- `index.html`에서 블루팀 챔피언 5개와 레드팀 챔피언 5개를 선택
+- 블루팀 챔피언 5개와 레드팀 챔피언 5개를 선택 (포지션 순서 지켜주세요.)
 - 각 팀의 조합을 완성한 후 "Submit" 버튼 클릭
 
 ### 2. 분석 결과 확인
