@@ -47,11 +47,13 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
 ### 3. 차트 해석 가이드
 
 #### 1. 챔피언 스탯
+<img width="846" height="608" alt="image" src="https://github.com/user-attachments/assets/e0d26e5d-8965-4243-af2d-408fc83c717e" />
 
 -   2025년 LCK, LPL, LEC, 국제대회 데이터를 기반으로\
     **각 챔피언의 Pick, Ban, Win Rate 제공**
     
 #### 2. 팀 시너지 & 카운터 히트맵
+<img width="1084" height="335" alt="image" src="https://github.com/user-attachments/assets/74cc54f9-5bf0-473c-bcbb-9c3e834c7114" />
 
 -   기준 챔피언(Y축)과 비교 챔피언(X축)의\
     **같은 팀 / 상대 팀 조합 시 승률 변화량을 히트맵으로 시각화**
@@ -71,6 +73,7 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
 -   히트맵 수치: **-6.7**
 
 #### 3. 팀 공격/방어 수치 & AD/AP 비율
+<img width="1037" height="343" alt="image" src="https://github.com/user-attachments/assets/a7191c87-dc79-4172-9d23-68bf2d5fc798" />
 
 선택된 챔피언들의 평균 스탯 분석:
 
@@ -90,6 +93,8 @@ XGBoost 머신러닝 모델과 다양한 게임 통계 지표를 활용하여 �
 - **균형**: AD/AP 35~55%
 - 
 #### 4. 분당 골드 획득량
+<img width="698" height="512" alt="image" src="https://github.com/user-attachments/assets/147bddd2-ff92-45ef-871b-93b7d5ff7322" />
+
 #### 골드 획득량
 - **0-10분**: ±10 이상 차이 시 우세/열세 판정
 - **10-20분, 20-30분**: ±20 이상 차이 시 우세/열세 판정
