@@ -3,7 +3,7 @@ name: Keep Render Server Awake
 on:
   schedule:
     # 14분마다 실행 (Render는 15분 미접속 시 슬립 모드 전환)
-    - cron: '*/14 * * * *'
+    - cron: '*/13 * * * *'
   workflow_dispatch: # 수동 실행 옵션
 
 jobs:
@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Ping Website
         # 아래 주소를 본인의 배포된 웹서비스 주소로 변경하세요
-        run: curl https://banpick.onrender.com/mainapp/
+        run: curl https://banpick.onrender.com/
