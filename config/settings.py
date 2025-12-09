@@ -11,7 +11,7 @@ import dj_database_url
 
 # SECURITY WARNING: keep the secret key used in production secret!
 #SECRET_KEY = mysettings.SECRET_KEY
-SECRET_KEY = os.environ.get('SECRET_KEY', mysettings.SECRET_KEY)
+SECRET_KEY = os.environ.get('SECRET_KEY')
 #DATABASES = mysettings.DATABASES
 DATABASE_URL = os.environ.get("DATABASE_URL")
 if DATABASE_URL:
