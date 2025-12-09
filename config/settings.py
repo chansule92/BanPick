@@ -19,7 +19,7 @@ if DATABASE_URL:
         'default': dj_database_url.config(default=DATABASE_URL, conn_max_age=600)
     }
 else:
-    DATABASES = mysettings.DATABASES
+    DATABASES = None
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent
