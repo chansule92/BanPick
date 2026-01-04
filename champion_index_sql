@@ -1,0 +1,516 @@
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('aatrox', '아트록스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ahri', '아리');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('akali', '아칼리');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('akshan', '아크샨');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('alistar', '알리스타');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ambessa', '암베사');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('amumu', '아무무');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('anivia', '애니비아');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('annie', '애니');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('aphelios', '아펠리오스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ashe', '애쉬');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('aurelion sol', '아우렐리온 솔');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('aurora', '오로라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('azir', '아지르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('bard', '바드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('belveth', '벨베스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('blitzcrank', '블리츠 크랭크');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('brand', '브랜드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('braum', '브라움');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('briar', '브라이어');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('caitlyn', '케이틀린');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('camille', '카밀');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('cassiopeia', '카시오페아');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('chogath', '초가스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('corki', '코르키');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('darius', '다리우스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('diana', '다이애나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('draven', '드레이븐');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ekko', '에코');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('elise', '엘리스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('evelynn', '이블린');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ezreal', '이즈리얼');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('fiddlesticks', '피들스틱');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('fiora', '피오라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('fizz', '피즈');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('galio', '갈리오');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('gangplank', '갱플랭크');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('garen', '가렌');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('gnar', '나르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('gragas', '그라가스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('graves', '그레이브즈');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('gwen', '그웬');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('hecarim', '헤카림');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('heimerdinger', '하이머딩거');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('hwei', '흐웨이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('illaoi', '일라오이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('irelia', '이렐리아');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ivern', '아이번');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('janna', '잔나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('jarvan iv', '자르반4세');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('jax', '잭스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('jayce', '제이스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('jhin', '진');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('jinx', '징크스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kaisa', '카이사');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kalista', '칼리스타');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('karma', '카르마');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('karthus', '카서스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kassadin', '카사딘');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('katarina', '카타리나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kayle', '케일');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kayn', '케인');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kennen', '케넨');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('khazix', '카직스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kindred', '킨드레드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kled', '클레드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('kogmaw', '코그모');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ksante', '크산테');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('leblanc', '르블랑');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lee sin', '리신');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('leona', '레오나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lillia', '릴리아');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lissandra', '리산드라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lucian', '루시안');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lulu', '룰루');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('lux', '럭스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('malphite', '말파이트');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('malzahar', '말자하');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('maokai', '마오카이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('masteryi', '마스터이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('mel', '멜');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('milio', '밀리오');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('miss fortune', '미스포츈');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('mordekaiser', '모데카이저');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('morgana', '모르가나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('mundo', '문도');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('naafiri', '나피리');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nami', '나미');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nasus', '나서스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nautilus', '노틸러스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('neeko', '니코');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nidalee', '니달리');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nilah', '닐라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nocturne', '녹턴');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('nunu', '누누');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('olaf', '올라프');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('orianna', '오리아나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ornn', '오른');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('pantheon', '판테온');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('poppy', '뽀삐');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('pyke', '파이크');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('qiyana', '키아나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('quinn', '퀸');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('rakan', '라칸');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('rammus', '람머스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('reksai', '렉사이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('rell', '렐');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('renata glasc', '레나타');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('renekton', '레넥톤');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('rengar', '렝가');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('riven', '리븐');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('rumble', '럼블');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ryze', '라이즈');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('samira', '사미라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sejuani', '세주아니');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('senna', '세나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('seraphine', '세라핀');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sett', '세트');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('shaco', '샤코');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('shen', '쉔');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('shyvana', '쉬바나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('singed', '신지드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sion', '사이온');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sivir', '시비르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('skarner', '스카너');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('smolder', '스몰더');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sona', '소나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('soraka', '소라카');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('swain', '스웨인');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('sylas', '사일러스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('syndra', '신드라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('tahm kench', '탐켄치');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('taliyah', '탈리야');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('talon', '탈론');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('taric', '타릭');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('teemo', '티모');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('thresh', '쓰레쉬');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('tristana', '트리스타나');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('trundle', '트런들');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('tryndamere', '트린다미어');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('twisted fate', '트위스티드 페이트');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('twitch', '트위치');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('udyr', '우디르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('urgot', '우르곳');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('varus', '바루스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('vayne', '베인');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('veigar', '베이가');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('velkoz', '벨코즈');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('vex', '벡스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('vi', '바이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('viego', '비에고');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('viktor', '빅토르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('vladimir', '블라디미르');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('volibear', '볼리베어');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('warwick', '워윅');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('wukong', '오공');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('xayah', '자야');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('xerath', '제라스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('xin zhao', '신짜오');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('yasuo', '야스오');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('yone', '요네');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('yorick', '요릭');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('yunara', '유나라');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('yuumi', '유미');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zaahen', '자헨');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zac', '자크');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zed', '제드');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zeri', '제리');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('ziggs', '직스');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zilean', '질리언');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zoe', '조이');
+INSERT INTO mainapp_champion_index
+(EN, KR)
+VALUES('zyra', '자이라');
