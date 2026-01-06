@@ -1,5 +1,5 @@
 from pathlib import Path
-from . import mysettings
+#from . import mysettings
 import os
 import dj_database_url
 
