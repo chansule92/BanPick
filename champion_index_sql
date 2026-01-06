@@ -1,3 +1,9 @@
+CREATE TABLE mainapp_champion_index (
+  EN varchar(32) NOT NULL,
+  KR varchar(32) DEFAULT NULL,
+  PRIMARY KEY (EN)
+)
+
 INSERT INTO mainapp_champion_index
 (EN, KR)
 VALUES('aatrox', '아트록스');
